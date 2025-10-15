@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "rootDir": "./src", // <--- Important: This tells TypeScript where your source files are
+    "outDir": "./dist", // <--- Where compiled JS will go (can be anything, but 'dist' is common)
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts"], // <--- Include all .ts files in src
+  "exclude": ["node_modules"]
+}

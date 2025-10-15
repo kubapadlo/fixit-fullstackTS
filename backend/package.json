@@ -2,17 +2,25 @@
   "name": "fixitbackend",
   "version": "1.0.0",
   "description": "UNI project",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon --legacy-watch server.js"
+  "main": "server.types",
+"scripts": {
+    "dev": "nodemon --legacy-watch src --ext ts --exec \"ts-node --project tsconfig.json src/server.ts\""
   },
   "author": "Jakub Padlo",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.1",
     "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/mongoose": "^5.11.96",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
