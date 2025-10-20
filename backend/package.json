@@ -10,24 +10,22 @@
   "author": "Jakub Padlo",
   "license": "ISC",
   "dependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
-    "mongoose": "^8.19.1",
-    "nodemon": "^3.1.10"
+    "mongoose": "^8.19.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.3",
-    "@types/mongodb": "^4.0.6",
-    "@types/mongoose": "^5.11.96",
+    "@types/jsonwebtoken": "^9.0.10",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "nodemon": "^3.1.10"
   }
 }

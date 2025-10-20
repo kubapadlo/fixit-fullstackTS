@@ -40,7 +40,7 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-/*
+
 const login = async(req: Request,res: Response)=>{
   try {
     const loginData = req.body as LoginRequestBody
@@ -87,7 +87,3 @@ const login = async(req: Request,res: Response)=>{
 }
 
 export {register,login}
-
-*/
-
-export default register
