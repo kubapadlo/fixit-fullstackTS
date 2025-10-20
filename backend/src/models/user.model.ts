@@ -1,7 +1,7 @@
 import mongoose, { Schema, Model } from "mongoose";
-import { User } from "../types/user.types";
+import { IUser } from "../types/user.types";
 
-const userSchema: Schema<User> = new Schema({
+const userSchema: Schema<IUser> = new Schema({
   username: {
     type: String,
     required: [true, "username is required"],
@@ -16,6 +16,6 @@ const userSchema: Schema<User> = new Schema({
   },
 });
 
-const User : Model<User> = mongoose.model<User>("User", userSchema);
+const User : Model<IUser> = mongoose.model<IUser>("User", userSchema);
 
 export default User

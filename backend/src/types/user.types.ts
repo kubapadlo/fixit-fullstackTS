@@ -1,10 +1,17 @@
+import {Document} from 'mongoose'
+
 export interface RegisterRequestBody {
   username: string;
   email: string;
   password: string;
 }
 
-export interface User {
+export interface LoginRequestBody {
+  email: string;
+  password: string;
+}
+
+export interface IUser extends Document {
   username: string;
   email: string;
   passwordHash: string;
