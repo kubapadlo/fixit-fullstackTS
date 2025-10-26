@@ -1,10 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { IUser } from "../types/user.types";
-
-enum roles{
-  admin,
-  user
-}
+import Joi from "joi";
 
 const userSchema: Schema<IUser> = new Schema({
   username: {
@@ -27,5 +23,21 @@ const userSchema: Schema<IUser> = new Schema({
 });
 
 const User : Model<IUser> = mongoose.model<IUser>("User", userSchema);
+
+// do walidacji danych ktore przychodzą do backendu
+export const userLoginValidationSchema = {
+  body: Joi.object({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  })
+}
+
+export const userRegisterValidationSchema = {
+  body: Joi.object({
+    username: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  })
+}
 
 export default User

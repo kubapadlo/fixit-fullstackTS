@@ -25,7 +25,7 @@ const register = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(newUser.password, 10);
-
+    
     const createdUser = await User.create({
       username: newUser.username,
       email: newUser.email,
