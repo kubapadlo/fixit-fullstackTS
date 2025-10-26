@@ -18,3 +18,8 @@ export interface IUser extends Document {
   passwordHash: string;
   role: string;
 }
+
+export interface MyJwtPayload extends JwtPayload {
+  id: number;
+  role: string
+}

@@ -2,8 +2,10 @@ import express from "express";
 import authRouter from "./routers/authRoutes";
 import cookieParser from "cookie-parser"
 
-import { verifyJWT } from "./middleware/verifyJWT";
-import { verifyRole } from "./middleware/verifyRole";
+// @ts-ignore
+import { verifyJWT } from "./middleware/verifyJWT.js";
+// @ts-ignore
+import { verifyRole } from "./middleware/verifyRole.js";
 
 const app = express();
 
