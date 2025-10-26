@@ -61,21 +61,19 @@ const login = async(req: Request,res: Response)=>{
     }
 
     const accesToken = jwt.sign(
-      { userId: user._id }, 
+      { userId: user._id, role:user.role }, 
       process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: "1m" } 
+      { expiresIn: "5m" } 
     );
 
     const refreshToken = jwt.sign(
-      { userId: user._id }, 
+      { userId: user._id, role:user.role }, 
       process.env.SECRET_REFRESH_KEY as string, 
       { expiresIn: "15m" } 
     );
 
     res.cookie("jwt", refreshToken, {
-      httpOnly: true, // Niedostępne dla JavaScript
-      secure: false,
-      sameSite: "lax", // Ochrona przed CSRF
+      httpOnly: true, // Niedostępne dla JavaScript, ochrona przed XSS
       maxAge: 15 * 1000 * 1000,
     });
 
