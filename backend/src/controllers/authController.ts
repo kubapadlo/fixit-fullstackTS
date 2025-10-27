@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model";
 
 // typy
-import { LoginRequestBody, RegisterRequestBody } from "../types/user.types";
+import { LoginRequestBody, MyJwtPayload, RegisterRequestBody } from "../types/user.types";
 
 const register = async (req: Request, res: Response) => {
   try {
@@ -84,4 +84,27 @@ const login = async(req: Request,res: Response)=>{
   }
 }
 
-export {register,login}
+const refreshToken = async(req:Request, res:Response) => {
+  try {
+    const rtoken = req.cookies?.jwt;
+
+  if (!rtoken){
+    return res.status(401).json({message: "No refresh token in cookie"})
+  }
+
+  jwt.verify(rtoken, process.env.SECRET_REFRESH_KEY as string, (err:any, decoded:any)=>{
+    if(err){
+      return res.status(401).json({message: "Refresh token is not valid"})
+    }
+    const payload = decoded as MyJwtPayload;
+    const newAccessToken = jwt.sign({id: payload.id, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "5m" }  )
+
+    return res.status(200).json({newAccessToken})
+  })
+  } catch (error) {
+    return res.status(500).json({message: "Internal Server Error"})
+  }
+  
+};
+
+export {register,login, refreshToken}
