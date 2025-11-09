@@ -29,6 +29,15 @@ export interface IUser extends Document {
 }
 
 export interface MyJwtPayload extends JwtPayload {
-  id: number;
+  userId: number;
   role: string
+}
+
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: MyJwtPayload;    // dzieki '?' dziala rowniez w trasach ktore nie korzystaja z JWT
+    }
+  }
 }

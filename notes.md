@@ -103,3 +103,56 @@ const addFault = async (req: Request, res: Response) => {
 - Nastepny middleware skorzysta z tego naglowka aby zweryfikowac czy ta rola ma dostep do kontrolera
 - Jesli token i rola sie zgadzaja to walidacje przechodzi `req.body`. Sprawdzane jest czy zawiera wymagane pola o odpowiedniej nazwie oraz czy sa one odpowiedniego typu itd...
 - Jesli żaden middleware nie zwroci bledu to dochodzimy do funkcji kontrolera ktora ma pewnosc ze obsluzy poprawnie skonstruowane żądanie.
+
+### Skąd brać id?
+
+Jesli operujemy tokenem JWT to o wiele lepiej wyciągać userID z niego, a nie z URL.
+Jest to bezpieczniejsze i czystsze rozwiązanie.
+
+```ts
+// verifyJWT.js
+req.user = decoded;
+
+// kontroler
+const userID = req.user?.userId;
+```
+
+Używanie userID w URL ma sens tylko wtedy, gdy administrator wykonuje operacje na cudzych kontach
+
+```ts
+userRouter.post("/:userID/addFault");
+const { userID } = req.params;
+```
+
+### Typowanie stałe i jednorazowe
+
+#### Stałe
+
+```ts
+declare global {
+  namespace Express {
+    interface Request {
+      user?: MyJwtPayload; // dzieki '?' dziala rowniez w trasach ktore nie korzystaja z JWT
+    }
+  }
+}
+```
+
+Dzięki temu **każde** req w projekcie będzie miało pole user.
+Przydatne gdy mamy walidator ktory dodaje zdekodowany payload tokena do naglowka.
+
+#### Pojedyncze
+
+```ts
+export interface newFaultBody {
+  description: string;
+  state?: string;
+  review?: string;
+}
+
+const addFault = async (req: Request<{}, {}, newFaultBody>, res: Response) => {
+  const faultData = req.body; // W pełni typowane
+};
+```
+
+Lokalne typowanie, elastyczne rozwiazanie gdy kazdy kontroler przyjmuje inne body

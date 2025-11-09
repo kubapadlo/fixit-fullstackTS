@@ -3,13 +3,10 @@ import User from "../models/user.model";
 import { newFaultBody } from "../types/fault.types";
 import { Fault } from "../models/flaw.model";
 
-interface AddFaultParams {
-  userID: string;
-}
-
-const addFault = async (req: Request<AddFaultParams>, res: Response) => {
+const addFault = async (req: Request<{}, {}, newFaultBody>, res: Response) => {
   try {
-    const { userID } = req.params;
+    // const { userID } = req.params;
+    const userID = req.user?.userId;
 
     const foundUser = await User.findById(userID);
 
@@ -17,7 +14,7 @@ const addFault = async (req: Request<AddFaultParams>, res: Response) => {
       return res.status(404).json({message: "User with this id does not exist!"})
     }
 
-    const faultData = req.body as newFaultBody;
+    const faultData = req.body;
 
     const newFault = await Fault.create({
         reportedAt: Date.now(),
@@ -37,7 +34,7 @@ const addFault = async (req: Request<AddFaultParams>, res: Response) => {
 
 const showFaults = async (req: Request, res:Response) => {
   try {
-    const {userID} = req.params;
+    const userID = req.user?.userID;
     const foundUser = await User.findById(userID)
         if(!foundUser){
       return res.status(404).json({message: "User with this id does not exist!"})
