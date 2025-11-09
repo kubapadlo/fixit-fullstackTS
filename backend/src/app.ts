@@ -1,6 +1,9 @@
 import express from "express";
-import authRouter from "./routers/authRoutes";
 import cookieParser from "cookie-parser"
+
+//routery
+import authRouter from "./routers/authRoutes";
+import userRouter from "./routers/userRouter";
 
 // @ts-ignore
 import { verifyJWT } from "./middleware/verifyJWT.js";
@@ -13,6 +16,7 @@ app.use(express.json());
 app.use(cookieParser())
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 app.get('/testPage', verifyJWT, verifyRole("admin", "user"), (req,res)=>{
     res.json({message: "Hello World"})

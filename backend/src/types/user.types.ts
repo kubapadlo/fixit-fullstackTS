@@ -5,6 +5,11 @@ export interface RegisterRequestBody {
   username: string;
   email: string;
   password: string;
+  role: string;
+  location? : {
+    dorm: string,
+    room: string
+  };
 }
 
 export interface LoginRequestBody {
@@ -17,6 +22,10 @@ export interface IUser extends Document {
   email: string;
   passwordHash: string;
   role: string;
+  location?: {
+    dorm: string;
+    room: string;
+  };
 }
 
 export interface MyJwtPayload extends JwtPayload {

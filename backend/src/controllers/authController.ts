@@ -30,6 +30,8 @@ const register = async (req: Request, res: Response) => {
       username: newUser.username,
       email: newUser.email,
       passwordHash: hashedPassword,
+      role: newUser.role, // optional
+      location : newUser.location,  // optional
     });
 
     return res

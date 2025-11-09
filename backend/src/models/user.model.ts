@@ -17,8 +17,12 @@ const userSchema: Schema<IUser> = new Schema({
   },
   role: {
     type: String,
-    enum: ["user", "admin", "worker"],
-    default: "user"
+    enum: ["student", "technician", "admin"],
+    default: "student"
+  },
+  location: {
+    dorm: {type: String},
+    room: {type: String}
   }
 });
 
@@ -37,6 +41,18 @@ export const userRegisterValidationSchema = {
     username: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.string().required(),
+    role: Joi.string().valid("student", "technician", "admin").default("student"),
+    location: Joi.object({
+      dorm: Joi.string(),
+      room: Joi.string()
+    }).when("role", {
+      is: "student",
+      then: Joi.object({
+        dorm: Joi.string().required(),
+        room: Joi.string().required(),
+      }).required(),
+      otherwise: Joi.forbidden(), // Technicy / Admini nie powinni mieć pola room
+    }),
   })
 }
 
