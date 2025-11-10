@@ -1,8 +1,8 @@
 # Notatki czego nauczylem sie w praktyce
 
-### 1. Rzucanie bledow ma sens tylko wtedy gdy kod w ktorym jest wywolana funckja rzucajaca blad ma blok trycatch
+## 1. Rzucanie bledow ma sens tylko wtedy gdy kod w ktorym jest wywolana funckja rzucajaca blad ma blok trycatch
 
-### 2. async/await vs then/catch
+## 2. async/await vs then/catch
 
 **Ten sam efekt** ale uzywa sie trycatch bo jest noweczesniejsze i bardziej czytelne
 
@@ -16,11 +16,11 @@ try {
 mongoose.connect().then().catch();
 ```
 
-### 3. Docker na windowsie
+## 3. Docker na windowsie
 
 Przy uruchamianiu kontenera Docker Desktop musi być uruchomiony, ponieważ na Windowsie nie ma natywnego silnika Dockera, tak jak na Linuxie
 
-### 4. Typowanie modelu
+## 4. Typowanie modelu
 
 ```ts
 // types.ts
@@ -37,7 +37,7 @@ Dzieki temu metody wywołane na User zwrócą obiekt User, zapewni to autouzupe�
 
 User.Create() - bedzie wymagać pól zgodnych z IUser
 
-### Walidacja backend joi - .when()
+## Walidacja backend joi - .when()
 
 Pozwala na walidacje warunkowa. Na przyklad jak jakies pola ma daną wartość to inne pole musi mieć jakąś tam
 
@@ -56,7 +56,7 @@ export const userRegisterValidationSchema = {
 }
 ```
 
-### Pola ktore zostana wypelnione w przyszlosci
+## Pola ktore zostana wypelnione w przyszlosci
 
 ```
 // schema
@@ -69,7 +69,9 @@ review: {
 review: Joi.string().allow('').optional()
 ```
 
-### Korealcja miedzy modelami mongoose - .populate()
+Jesli nie podamy wartosci to mongoose automatycznie utworzy pusty string - chodzi o to zeby uniknac nulla i undefined
+
+## Korealcja miedzy modelami mongoose - .populate()
 
 Jeśli w schemacie zdefiniuje pole ktore jest referencją do innego modlelu `reportedBy: { type: Schema.Types.ObjectId, ref: "User"},`, możesz użyć `.find.populate('User')`, a Mongoose automatycznie "podmieni" ID Usera na cały dokument tego obiektu.
 
@@ -78,7 +80,7 @@ await Fault.find().populate('reportedBy'):
 ```
 
 ```json
- "reportedBy": {
+"reportedBy": {
      "location": {
          "dorm": "Olimp",
          "room": "711A"
@@ -93,14 +95,14 @@ await Fault.find();
 ```
 
 ```json
-    "reportedBy": "690faf089864e7a6a3d4c300"
+"reportedBy": "690faf089864e7a6a3d4c300"
 ```
 
-### Przepływ danych przez middleware
+## Przepływ danych przez middleware
 
 ```ts
 userRouter.post(
-  "/:userID/addFault",
+  "/addFault",
   verifyJWT,
   verifyRole("student"),
   validate(newFaultSchema),
@@ -127,7 +129,7 @@ const addFault = async (req: Request, res: Response) => {
 - Jesli token i rola sie zgadzaja to walidacje przechodzi `req.body`. Sprawdzane jest czy zawiera wymagane pola o odpowiedniej nazwie oraz czy sa one odpowiedniego typu itd...
 - Jesli żaden middleware nie zwroci bledu to dochodzimy do funkcji kontrolera ktora ma pewnosc ze obsluzy poprawnie skonstruowane żądanie.
 
-### Skąd brać id?
+## Skąd brać id?
 
 Jesli operujemy tokenem JWT to o wiele lepiej wyciągać userID z niego, a nie z URL.
 Jest to bezpieczniejsze i czystsze rozwiązanie.
@@ -147,9 +149,9 @@ userRouter.post("/:userID/addFault");
 const { userID } = req.params;
 ```
 
-### Typowanie stałe i jednorazowe
+## Typowanie stałe i jednorazowe
 
-#### Stałe
+### Stałe
 
 ```ts
 declare global {
@@ -164,7 +166,7 @@ declare global {
 Dzięki temu **każde** req w projekcie będzie miało pole user.
 Przydatne gdy mamy walidator ktory dodaje zdekodowany payload tokena do naglowka.
 
-#### Pojedyncze
+### Pojedyncze
 
 ```ts
 export interface newFaultBody {
@@ -180,7 +182,7 @@ const addFault = async (req: Request<{}, {}, newFaultBody>, res: Response) => {
 
 Lokalne typowanie, elastyczne rozwiazanie gdy kazdy kontroler przyjmuje inne body
 
-### Specjalny middleware do obslugi bledow - 4 arguemnty!
+## Specjalny middleware do obslugi bledow - 4 arguemnty!
 
 Wywoła się **tylko** wtedy gdy poprzedni middleware wywoła `next(error)` lub wystąpił wyjątek w async funkcji. Express automatycznie przeskoczy do tego middleware'a (rozpozna go po dodatkowym argumencie 'err')
 
@@ -190,7 +192,7 @@ const multerErrorHandler = (err, req, res, next);
 
 ### Uwaga!!! - Multer przy bledzie automatycznie wyrzuci next(error)
 
-### Promisy
+## Promisy
 
 Pare zasad:
 
@@ -198,11 +200,32 @@ Pare zasad:
 2. Aby promise nie zawisł musi mieć resolve() lub reject()
 3. Każdy Promise może zostać rozwiązany (resolve) albo odrzucony (reject) tylko jeden raz
 4. Nie zapewnia asynchronicznosci, jest tylko narzedziem które je obsługuje
-5. Promisy zamykamy w
 
 ```
 new Promise((resolve, reject) => {
   resolve("OK");
   reject("Error");  // BŁĄD!!!
 });
+```
+
+## Edytowanie
+
+Ograniczenie pól które można edytowac - stworzenie walidatora JOI
+
+```ts
+export const editFaultSchema = {
+  body: Joi.object({
+    description: Joi.string(),
+  }).unknown(false), // wszystkie pola o innej nazwie nie zostaną przepuszczane - wyrzuci blad
+};
+```
+
+Składnia edycji:
+
+```ts
+const updatedFault = await Fault.findOneAndUpdate(
+  { _id: faultID, reportedBy: req.user?.userId }, // zabezpieczenie ze tylko wlasciciel moze edytowac swoją usterke
+  { $set: newData },
+  { new: true }
+);
 ```
