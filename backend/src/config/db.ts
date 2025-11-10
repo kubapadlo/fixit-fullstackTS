@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
-const connectDB = async (): Promise<void> => {
+const connectDB = async () => {
   try {
     const mongoUri = process.env.MONGO_URI;
     if (!mongoUri) throw new Error("MONGO_URI not defined in .env");

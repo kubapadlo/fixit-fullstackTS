@@ -71,7 +71,30 @@ review: Joi.string().allow('').optional()
 
 ### Korealcja miedzy modelami mongoose - .populate()
 
-Jeśli w schemacie zdefiniuje pole ktore jest referencją do innego modlelu `reportedBy: { type: Schema.Types.ObjectId, ref: "User"},`, możesz użyć .populate(''), a Mongoose automatycznie "podmieni" ID Usera na cały dokument tego obiektu.
+Jeśli w schemacie zdefiniuje pole ktore jest referencją do innego modlelu `reportedBy: { type: Schema.Types.ObjectId, ref: "User"},`, możesz użyć `.find.populate('User')`, a Mongoose automatycznie "podmieni" ID Usera na cały dokument tego obiektu.
+
+```ts
+await Fault.find().populate('reportedBy'):
+```
+
+```json
+ "reportedBy": {
+     "location": {
+         "dorm": "Olimp",
+         "room": "711A"
+     },
+ }
+```
+
+---
+
+```ts
+await Fault.find();
+```
+
+```json
+    "reportedBy": "690faf089864e7a6a3d4c300"
+```
 
 ### Przepływ danych przez middleware
 
@@ -156,3 +179,30 @@ const addFault = async (req: Request<{}, {}, newFaultBody>, res: Response) => {
 ```
 
 Lokalne typowanie, elastyczne rozwiazanie gdy kazdy kontroler przyjmuje inne body
+
+### Specjalny middleware do obslugi bledow - 4 arguemnty!
+
+Wywoła się **tylko** wtedy gdy poprzedni middleware wywoła `next(error)` lub wystąpił wyjątek w async funkcji. Express automatycznie przeskoczy do tego middleware'a (rozpozna go po dodatkowym argumencie 'err')
+
+```ts
+const multerErrorHandler = (err, req, res, next);
+```
+
+### Uwaga!!! - Multer przy bledzie automatycznie wyrzuci next(error)
+
+### Promisy
+
+Pare zasad:
+
+1. Await rozpakowuje promise aby uzyskac wartosc
+2. Aby promise nie zawisł musi mieć resolve() lub reject()
+3. Każdy Promise może zostać rozwiązany (resolve) albo odrzucony (reject) tylko jeden raz
+4. Nie zapewnia asynchronicznosci, jest tylko narzedziem które je obsługuje
+5. Promisy zamykamy w
+
+```
+new Promise((resolve, reject) => {
+  resolve("OK");
+  reject("Error");  // BŁĄD!!!
+});
+```

@@ -13,4 +13,5 @@ export interface IFault extends Document {
   description: string;
   state: string;
   review: string;
+  image: string
 }

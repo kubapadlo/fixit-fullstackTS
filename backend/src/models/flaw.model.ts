@@ -25,6 +25,10 @@ const faultSchema : Schema<IFault> = new Schema({
   review: {
     type: String,
     default: ''
+  },
+  image: {
+    type: String,
+    default: ''
   }
 })
 
@@ -35,6 +39,7 @@ export const newFaultSchema = {
     reportedAt: Joi.date().default(()=> new Date()),
     description: Joi.string().required(),
     state: Joi.string().valid('reported', 'fixed').default('reported'),
-    review: Joi.string().allow('').optional()
+    review: Joi.string().allow('').optional(),
+    image: Joi.string().allow('').uri().optional()
   })
 };
