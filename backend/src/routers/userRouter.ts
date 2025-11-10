@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { addFault, addReview, editFault, showFaults, upload } from "../controllers/userController";
+import { addFault, addReview, deleteFault, editFault, showFaults, upload } from "../controllers/userController";
 
 import { addReviewSchema, editFaultSchema, newFaultSchema } from "../models/fault.model";
 // @ts-ignore
@@ -18,5 +18,6 @@ userRouter.post("/addFault", verifyJWT, verifyRole("student"), upload, multerErr
 userRouter.get("/showFaults", verifyJWT, showFaults);
 userRouter.put('/:faultID/edit', verifyJWT, upload, validate(editFaultSchema), editFault)
 userRouter.put('/:faultID/review', verifyJWT, validate(addReviewSchema), addReview)
+userRouter.delete('/:faultID/delete', verifyJWT, deleteFault)
 
 export default userRouter;

@@ -229,3 +229,13 @@ const updatedFault = await Fault.findOneAndUpdate(
   { new: true }
 );
 ```
+
+## Usuwanie plikow cloudinary
+
+Aby usunac plik potrzebujemy jego public_id. Dlatego wczesniej przy uploadowaniu obrazka musimy je przechwycic i zapisac w bazie.
+
+```ts
+if (deletedFault?.imageID) {
+  await cloudinary.uploader.destroy(deletedFault.imageID);
+}
+```

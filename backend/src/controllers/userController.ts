@@ -8,6 +8,7 @@ import multer, {FileFilterCallback} from 'multer';
 import { set } from "mongoose";
 import { string } from "joi";
 
+// --------------- MULTER -------------------
 const storage = multer.memoryStorage();
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
@@ -22,6 +23,8 @@ export const upload = multer({
   storage: storage,
   fileFilter: fileFilter
 }).single('image')
+
+// ------------------------------------------
 
 //pomocniczna
 const uploadToCloudinary = (filebuffer: Buffer) : Promise<{ url: string|undefined; id: string|undefined }> =>{
@@ -163,4 +166,27 @@ const addReview = async (req: Request<{faultID:string},{},{review:string}>, res:
 
 }
 
-export { addFault, showFaults, editFault, addReview };
+const deleteFault = async (req:Request,res:Response) => {
+  try {
+    const {faultID} = req.params;
+
+    const deletedFault = await Fault.findOneAndDelete({
+      _id: faultID, reportedBy: req.user?.userId
+    });
+
+    if(deletedFault?.imageID){
+      await cloudinary.uploader.destroy(deletedFault.imageID);
+    }
+
+    if (!deletedFault) {
+      return res.status(404).json({ message: "Fault not found or not authorized to delete" });
+    }
+
+    return res.status(200).json({deletedFault, message: `Fault wtih ID ${faultID} deleted successfuly`})
+
+  } catch (error) {
+    return res.status(500).json({message: "Error while deleting a fault"})
+  } 
+}
+
+export { addFault, showFaults, editFault, addReview, deleteFault};
