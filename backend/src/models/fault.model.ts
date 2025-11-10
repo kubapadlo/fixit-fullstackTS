@@ -26,7 +26,11 @@ const faultSchema : Schema<IFault> = new Schema({
     type: String,
     default: ''
   },
-  image: {
+  imageURL: {
+    type: String,
+    default: ''
+  },
+  imageID: {  // konieczne do usuwania zdjec z cloudinary
     type: String,
     default: ''
   }
@@ -40,6 +44,13 @@ export const newFaultSchema = {
     description: Joi.string().required(),
     state: Joi.string().valid('reported', 'fixed').default('reported'),
     review: Joi.string().allow('').optional(),
-    image: Joi.string().allow('').uri().optional()
-  })
+    imageURL: Joi.string().uri().allow(''),
+    imageID: Joi.string().allow('')
+  }).and('imageURL', 'imageID') // albo oba pola są obecne albo żadne
 };
+
+export const editFaultSchema = {
+  body: Joi.object({
+    description: Joi.string(),
+  }).unknown(false)
+}

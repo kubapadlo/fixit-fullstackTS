@@ -13,5 +13,6 @@ export interface IFault extends Document {
   description: string;
   state: string;
   review: string;
-  image: string
+  imageURL: string
+  imageID: string  // konieczne do usuwania zdjec z cloudinary
 }

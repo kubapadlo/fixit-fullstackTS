@@ -1,10 +1,12 @@
-import { Request, Response } from "express";
+import { Request, Response, urlencoded } from "express";
 import User from "../models/user.model";
 import { newFaultBody } from "../types/fault.types";
-import { Fault } from "../models/flaw.model";
+import { Fault } from "../models/fault.model";
 import {createReadStream} from 'streamifier'
 import { cloudinary } from "../config/cloudinary";
 import multer, {FileFilterCallback} from 'multer';
+import { set } from "mongoose";
+import { string } from "joi";
 
 const storage = multer.memoryStorage();
 
@@ -22,13 +24,13 @@ export const upload = multer({
 }).single('image')
 
 //pomocniczna
-const uploadToCloudinary = (filebuffer: Buffer) : Promise<string|undefined> =>{
+const uploadToCloudinary = (filebuffer: Buffer) : Promise<{ url: string|undefined; id: string|undefined }> =>{
 
   return new Promise((resolve, reject) => {
     const upload_stream = cloudinary.uploader.upload_stream({ folder: "fixIT_uploads" }, (err, upload_data)=>{
       if(err) return reject(err)
       
-      resolve(upload_data?.secure_url)
+      resolve({url:upload_data?.secure_url, id:upload_data?.public_id})
     })
     createReadStream(filebuffer).pipe(upload_stream);
   })
@@ -39,32 +41,35 @@ const addFault = async(req:Request<{},{}, newFaultBody>, res:Response) => {
   try {
     const userID = req.user?.userId;
 
-  const foundUser = User.findById(userID)
-  if(!foundUser){
-    return res.status(404).json({message: "User with this id doesnt exist!"})
-  }
-
-  const formdata = req.body;
-  let imageUrl = "" as string|undefined;
-
-  if(req.file){
-    try {
-      imageUrl = await uploadToCloudinary(req.file.buffer)
-    } catch (error) {
-      return res.status(500).json("Error while uploading a file " + error)
+    const foundUser = User.findById(userID)
+    if(!foundUser){
+      return res.status(404).json({message: "User with this id doesnt exist!"})
     }
-  }
 
-  const newFault = await Fault.create({
-    reportedAt: Date.now(),
-    reportedBy: userID,
-    description: formdata.description,
-    state: formdata.state,
-    review: formdata.review,
-    image: imageUrl
-  })
+    const formdata = req.body;
+    let imageURL, imageID = "" as string|undefined;
+    
+    if(req.file){
+      try {
+        const {url,id} = await uploadToCloudinary(req.file.buffer)
+        imageURL = url;
+        imageID = id;
+      } catch (error) {
+        return res.status(500).json("Error while uploading a file " + error)
+      }
+    }
 
-  return res.status(201).json({newFault, message: "New fault created"})
+    const newFault = await Fault.create({
+      reportedAt: Date.now(),
+      reportedBy: userID,
+      description: formdata.description,
+      state: formdata.state,
+      review: formdata.review,
+      imageURL,
+      imageID
+    })
+
+    return res.status(201).json({newFault, message: "New fault created"})
   } catch (error) {
     return res.status(500).json({message: "Sth went wrong while adding new fault", error})
   }
@@ -89,6 +94,45 @@ const showFaults = async (req: Request, res:Response) => {
   }
 }
 
+const editFault = async (req: Request, res:Response) => {
+  try {
+    const {faultID} = req.params;
+    const faultToUpdate = await Fault.findById(faultID)
 
+    const newData: { description?: string; imageURL?: string; imageID?: string } = {};
+    newData.description = req.body?.description;
 
-export { addFault, showFaults };
+    if(req.file){
+      try {
+        // jeśli istnieje stare zdjęcie, usuń je
+        if (faultToUpdate?.imageID) {
+          await cloudinary.uploader.destroy(faultToUpdate.imageID);
+        }
+
+        const {url, id} = await uploadToCloudinary(req.file.buffer) 
+        newData.imageURL = url
+        newData.imageID = id;
+      } catch (error) {
+        return res.status(500).json({message:"Error upload file to cloudinary"})
+      }
+    }
+
+    const updatedFault = await Fault.findByIdAndUpdate(
+      faultID,
+      { $set: newData },
+      { new: true }
+    );
+
+    if(!updatedFault){
+      return res.status(404).json({message: "Fault with this id doesnt not exist"})
+    }
+
+    return res.status(200).json({updatedFault, message: "Succesfuly updated a fault"})
+
+  } catch (error) {
+    return res.status(500).json({message: "Error while updating a fault"})
+  }
+
+}
+
+export { addFault, showFaults, editFault };

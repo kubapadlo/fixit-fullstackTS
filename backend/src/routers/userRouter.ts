@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { addFault, showFaults, upload } from "../controllers/userController";
+import { addFault, editFault, showFaults, upload } from "../controllers/userController";
 
-import { newFaultSchema } from "../models/flaw.model";
+import { editFaultSchema, newFaultSchema } from "../models/fault.model";
 // @ts-ignore
 import {validate} from "../middleware/validate.js"
 // @ts-ignore
@@ -16,5 +16,6 @@ const userRouter = Router();
 
 userRouter.post("/addFault", verifyJWT, verifyRole("student"), upload, multerErrorHandler, validate(newFaultSchema), addFault);
 userRouter.get("/showFaults", verifyJWT, showFaults);
+userRouter.put('/:faultID/edit', upload, validate(editFaultSchema), editFault)
 
 export default userRouter;
