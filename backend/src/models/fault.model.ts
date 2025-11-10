@@ -54,3 +54,9 @@ export const editFaultSchema = {
     description: Joi.string(),
   }).unknown(false)
 }
+
+export const addReviewSchema = {
+  body: Joi.object({
+    review: Joi.string()
+  }).unknown(false)
+}

@@ -117,8 +117,8 @@ const editFault = async (req: Request, res:Response) => {
       }
     }
 
-    const updatedFault = await Fault.findByIdAndUpdate(
-      faultID,
+    const updatedFault = await Fault.findOneAndUpdate(
+      { _id: faultID, reportedBy: req.user?.userId }, // zabezpieczenie ze tylko wlasciciel moze edytowac swoją usterke
       { $set: newData },
       { new: true }
     );
@@ -135,4 +135,32 @@ const editFault = async (req: Request, res:Response) => {
 
 }
 
-export { addFault, showFaults, editFault };
+const addReview = async (req: Request<{faultID:string},{},{review:string}>, res:Response) => {
+  try {
+    const {review} = req.body
+    const {faultID} = req.params
+    const faultToReview = await Fault.findById(faultID)
+
+    if(!faultToReview || faultToReview.reportedBy.toString() != req.user?.userId){
+      return res.status(404).json({message: "You dont have any faults with this id"})
+    }
+
+    if(faultToReview.state != 'fixed'){
+      return res.status(400).json({message: "You can review only fixed faults"})
+    }
+
+    const updatedFault = await Fault.findOneAndUpdate(
+      {_id: faultID, reportedBy: req.user?.userId},
+      { $set: {review} },
+      { new : true}
+    )
+
+    return res.status(200).json({updatedFault, message:"Successfuly added a review"})
+
+  } catch (error) {
+      return res.status(500).json({message:"Error while adding a review"})
+  } 
+
+}
+
+export { addFault, showFaults, editFault, addReview };
