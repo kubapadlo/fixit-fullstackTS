@@ -239,3 +239,17 @@ if (deletedFault?.imageID) {
   await cloudinary.uploader.destroy(deletedFault.imageID);
 }
 ```
+
+## Wyrobic nawyk zwracania nowo-utworzonych i znalezionych danych dla frontendu
+
+```ts
+const user = await User.findOne({ email: loginData.email });
+
+return res.status(200).json({
+  user: { id: user._id, username: user.username, role: user.role },
+  accessToken: accesToken,
+  message: "Logged sucessfuly",
+});
+```
+
+### UWAGA! - Przy zwracaniu usera nie zwracamy wrażliwych danych, tylko przefiltrowane bez haseł itd!!!

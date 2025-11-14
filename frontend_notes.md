@@ -24,3 +24,86 @@ function AuthInitializer() {
   });
 }
 ```
+
+## Wazny mechanizm przekazywania bledow
+
+### Na froncie pamietac zeby rzucac bledy z wczescniej przygotowanym komunikatem z backendu
+
+```ts
+//backend
+if (!isValid) {
+  return res.status(401).json({ message: "Wrong password" });
+}
+
+//frontend
+throw new Error(error.response?.data.message);
+```
+
+# Komponenty z Wielkiej litery!
+
+## React router - obsluguje co ma sie wyswietlac w zaleznosci od URL bez przeladowania strony
+
+### W main.tsx tworzy sie provider ktory nie ma zadnych dzieci - jest najnizej w hierarchii
+
+```ts
+<StrictMode>
+  <AuthInitializer>
+    <RouterProvider router={router} /> // !!!
+  </AuthInitializer>
+</StrictMode>
+```
+
+## Tworzenie formsow
+
+```
+<form onSubmit={handleSubmit}>
+```
+
+#### handlesubmit to posrednik ktory pomoze obsluzyc nasze żądanie do serwera
+
+## label w formsie - 2 podejscia
+
+#### label oplatajacy input
+
+**Najczesciej stosowane**. Klikniecie tekstu lapie focus na polu do wpisywania
+
+```
+<label>
+  Email
+  <input type="text" onChange={...} />
+</label>
+
+```
+
+#### label i input osobno
+
+Klikniecie tekstu 'email' nic nie robi. Przydaje się, gdy label i input powinny byc niezalezne
+
+```
+<label>Email</label>
+<input id="email" type="text" onChange={...} />
+```
+
+# Obsluga zadan do backendu
+
+## 1. axios
+
+```ts
+export async function login({ email, password }: loginRequestType) {
+  try {
+    const result = await api.post<loginBodyType>("api/auth/login", {
+      body_requesta,
+    });
+    return result.data;
+  } catch (error) {
+    // Obsluga bledow
+  }
+}
+```
+
+### Wazne:
+
+1. typowanie wysylanego body
+2. typowanie co zwroci funkca
+3. async/await + try/catch
+4. obsluga bledow
