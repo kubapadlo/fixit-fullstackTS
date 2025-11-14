@@ -45,6 +45,7 @@ const register = async (req: Request, res: Response) => {
 
 const login = async(req: Request,res: Response)=>{
   try {
+    console.log("Proba logowania")
     const loginData = req.body as LoginRequestBody
 
     if(!loginData.email || !loginData.password){
@@ -79,7 +80,7 @@ const login = async(req: Request,res: Response)=>{
       maxAge: 15 * 1000 * 1000,
     });
 
-    return res.status(200).json({accessToken: accesToken, message: "Logged sucessfuly"})
+    return res.status(200).json({user:{id: user._id, username: user.username, role:user.role}, accessToken: accesToken, message: "Logged sucessfuly"})
     
   } catch (error) {
     return res.status(500).json({message: "Server error while logging"})
