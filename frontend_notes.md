@@ -25,7 +25,7 @@ function AuthInitializer() {
 }
 ```
 
-## Wazny mechanizm przekazywania bledow
+## Wazny mechanizm przekazywania bledow!!!
 
 ### Na froncie pamietac zeby rzucac bledy z wczescniej przygotowanym komunikatem z backendu
 
@@ -35,8 +35,17 @@ if (!isValid) {
   return res.status(401).json({ message: "Wrong password" });
 }
 
-//frontend
+//frontend /services
 throw new Error(error.response?.data.message);
+
+//frontend /pages
+const mutation = useMutation({
+    ...
+  });
+
+{mutation.isError && (
+  <div>{(mutation.error as Error).message}</div>
+)}
 ```
 
 # Komponenty z Wielkiej litery!
@@ -107,3 +116,31 @@ export async function login({ email, password }: loginRequestType) {
 2. typowanie co zwroci funkca
 3. async/await + try/catch
 4. obsluga bledow
+
+## 2. React-query
+
+Zalety:
+
+- cachowanie
+- gotowe funkcjonalosci np. mutation.isPending, mutation.isError
+
+```ts
+const mutation = useMutation({
+  mutationFn: login,
+  onSuccess: (data) => {
+    console.log(data);
+  },
+});
+
+const onSubmit = (data: formFields) => {
+  mutation.mutate(data); // wywoluje login
+};
+```
+
+# Schemat tworzenia formularzy
+
+1. html
+2. schemat pól i typu pól
+3. utworzenie formsa (useForm)
+4. podpiecie formsa (handleSubmit) i pól (register) do Zoda i RHF
+5. UX: Obsluga mutation.error i mutaion.isPending
