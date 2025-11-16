@@ -1,11 +1,6 @@
 import {api} from '../utils/api'
 import { isAxiosError } from "axios";
-
-type User = {
-    id: string,
-    username: string,
-    role:string
-}
+import type {User} from '../types/user.type';
 
 interface logindata {
     email: string,
@@ -13,14 +8,13 @@ interface logindata {
 }
 
 interface loginresult{
-    accesstoken: string,
+    accessToken: string,
     user: User
 }
 
 export async function login({email, password}:logindata) {
     try {
         const result = await api.post<loginresult>('api/auth/login', {email, password})
-        console.log(result.data)
         return result.data;
     } catch (error) {
         if(isAxiosError(error)){

@@ -9,6 +9,9 @@ import User from "../models/user.model";
 // typy
 import { LoginRequestBody, MyJwtPayload, RegisterRequestBody } from "../types/user.types";
 
+// flagi
+const debugMode = process.env.DEBUG_MODE === "true";
+
 const register = async (req: Request, res: Response) => {
   try {
     const newUser = req.body as RegisterRequestBody;
@@ -66,7 +69,7 @@ const login = async(req: Request,res: Response)=>{
     const accesToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: "5m" } 
+      { expiresIn: debugMode ? "5m" : "1m" } 
     );
 
     const refreshToken = jwt.sign(

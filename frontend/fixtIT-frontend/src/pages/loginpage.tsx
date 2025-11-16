@@ -3,6 +3,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useLoggedUserState } from "../store/userStore";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.email(),
@@ -12,6 +14,13 @@ const formSchema = z.object({
 type formFields = z.infer<typeof formSchema>;
 
 export function LoginPage() {
+  // zustand
+  const setUser = useLoggedUserState((state) => state.setUser);
+
+  // react-router
+  const navigate = useNavigate();
+
+  // React-hook-form
   const {
     register,
     handleSubmit,
@@ -24,7 +33,11 @@ export function LoginPage() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      console.log(data);
+      setUser(data.user, data.accessToken);
+
+      setTimeout(() => {
+        navigate("/home");
+      }, 1000);
     },
   });
 
