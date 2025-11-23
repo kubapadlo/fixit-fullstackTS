@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useLoggedUserState } from "../store/userStore";
 import { useNavigate } from "react-router-dom";
+import { TextField, Button, Box, Stack, Alert } from "@mui/material";
 
 const formSchema = z.object({
   email: z.email(),
@@ -47,30 +48,62 @@ export function LoginPage() {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* handleSubmit nie pusci formsa dopki nie przejdzie walidacji(zod) */}
-        <label>
-          Email
-          <input {...register("email")} type="text" placeholder="Email"></input>
-        </label>
-        <label>
-          Password
-          <input
-            {...register("password")}
-            type="password"
-            placeholder="Password"
-          ></input>
-        </label>
-        <button type="submit" disabled={mutation.isPending}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{
+        width: "100%",
+        maxWidth: 400,
+        mx: "auto",
+        mt: 4,
+        p: 3,
+        borderRadius: 3,
+        boxShadow: 3,
+        bgcolor: "background.paper",
+      }}
+    >
+      <Stack spacing={2}>
+        {/* Email */}
+        <TextField
+          label="Email"
+          type="text"
+          placeholder="Email"
+          {...register("email")}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+          fullWidth
+        />
+
+        {/* Password */}
+        <TextField
+          label="Password"
+          type="password"
+          placeholder="Password"
+          {...register("password")}
+          error={!!errors.password}
+          helperText={errors.password?.message}
+          fullWidth
+        />
+
+        {/* Submit button */}
+        <Button
+          variant="contained"
+          type="submit"
+          fullWidth
+          disabled={mutation.isPending}
+          sx={{ py: 1.3, borderRadius: 2 }}
+        >
           Click me
-        </button>
+        </Button>
+
+        {/* Backend errors */}
         {mutation.isError && (
-          <div color="red.500">{(mutation.error as Error).message}</div>
+          <Alert severity="error">{(mutation.error as Error).message}</Alert>
         )}
-        <br />
-        {errors.root && <div>{errors.root.message}</div>}
-      </form>
-    </>
+
+        {/* Zod root error */}
+        {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
+      </Stack>
+    </Box>
   );
 }

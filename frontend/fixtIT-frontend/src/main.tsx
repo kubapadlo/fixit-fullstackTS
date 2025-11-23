@@ -7,19 +7,50 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 import { LoginPage } from "./pages/loginpage.tsx";
 import Homepage from "./pages/homepage.tsx";
+import { WelcomePage } from "./pages/WelcomePage.tsx";
+
+import { useThemeStore } from "./store/themeStore.ts";
+
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { lightTheme, darkTheme } from "./theme.ts";
 
 // react-router
-const router = createBrowserRouter([{ path: "/", element: <LoginPage /> },
-  {path: "/home", element: <Homepage/>}
+import Layout from "./layouts/layout.tsx";
+const router = createBrowserRouter([
+  {
+    element: <Layout />, // stały layout
+    children: [
+      { path: "/", element: <WelcomePage /> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/home", element: <Homepage /> },
+    ],
+  },
 ]);
 
 //react-query
 const queryClient = new QueryClient();
 
+//
+function AppThemeProvider({ children }: { children: React.ReactNode }) {
+  const theme = useThemeStore((state) => state.theme);
+
+  const muiTheme = theme === "light" ? lightTheme : darkTheme;
+
+  return (
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  );
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <AppThemeProvider>
+        <RouterProvider router={router} />
+      </AppThemeProvider>
     </QueryClientProvider>
   </StrictMode>
 );
