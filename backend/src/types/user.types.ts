@@ -30,6 +30,7 @@ export interface IUser extends Document {
 
 export interface MyJwtPayload extends JwtPayload {
   userId: string;
+  username?: string
   role: string
 }
 

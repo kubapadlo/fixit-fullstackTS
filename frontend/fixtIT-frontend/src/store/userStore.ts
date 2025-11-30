@@ -5,12 +5,14 @@ type UserStore = {
     isAuthenticated : boolean,
     user: User | null,
     accessToken : string | null,
-    setUser: (user:User, accessToken:string) => void
+    setUser: (user:User, accessToken:string) => void,
+    logout: () => void
 }
 
 export const useLoggedUserState = create<UserStore>((set)=>({
     isAuthenticated : false,
     user : null,
     accessToken : null,
-    setUser : (user, accessToken) => set({isAuthenticated:true, user:user, accessToken:accessToken})
+    setUser : (user, accessToken) => set({isAuthenticated:true, user:user, accessToken:accessToken}),
+    logout: () => set({isAuthenticated:false, user:null, accessToken:null})
 }))

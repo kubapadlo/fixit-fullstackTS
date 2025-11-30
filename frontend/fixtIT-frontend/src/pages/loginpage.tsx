@@ -9,7 +9,7 @@ import { TextField, Button, Box, Stack, Alert } from "@mui/material";
 
 const formSchema = z.object({
   email: z.email(),
-  password: z.string(),
+  password: z.string().min(3, "At least 3 characters"),
 });
 
 type formFields = z.infer<typeof formSchema>;
@@ -34,6 +34,7 @@ export function LoginPage() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      console.log(data);
       setUser(data.user, data.accessToken);
 
       setTimeout(() => {
@@ -80,8 +81,8 @@ export function LoginPage() {
           type="password"
           placeholder="Password"
           {...register("password")}
-          error={!!errors.password}
-          helperText={errors.password?.message}
+          error={!!errors.password} // pokazuje czerwone obramowanie przy błędzie
+          helperText={errors.password?.message} // pod polem wyświetla komunikat błędu validacji ZODA
           fullWidth
         />
 
@@ -101,8 +102,8 @@ export function LoginPage() {
           <Alert severity="error">{(mutation.error as Error).message}</Alert>
         )}
 
-        {/* Zod root error */}
-        {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
+        {/* Zod root error
+        {errors.root && <Alert severity="error">{errors.root.message}</Alert>}*/}
       </Stack>
     </Box>
   );

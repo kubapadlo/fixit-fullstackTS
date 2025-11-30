@@ -73,7 +73,7 @@ const login = async(req: Request,res: Response)=>{
     );
 
     const refreshToken = jwt.sign(
-      { userId: user._id, role:user.role }, 
+      { userId: user._id, username: user.username, role:user.role }, 
       process.env.SECRET_REFRESH_KEY as string, 
       { expiresIn: "15m" } 
     );
@@ -93,7 +93,6 @@ const login = async(req: Request,res: Response)=>{
 const refreshToken = async(req:Request, res:Response) => {
   try {
     const rtoken = req.cookies?.jwt;
-
   if (!rtoken){
     return res.status(401).json({message: "No refresh token in cookie"})
   }
@@ -105,12 +104,24 @@ const refreshToken = async(req:Request, res:Response) => {
     const payload = decoded as MyJwtPayload;
     const newAccessToken = jwt.sign({id: payload.id, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "5m" }  )
 
-    return res.status(200).json({newAccessToken})
+    return res.status(200).json({accessToken: newAccessToken, user:{id: payload.userId, username:payload.username, role: payload.role}})
   })
   } catch (error) {
     return res.status(500).json({message: "Internal Server Error"})
   }
-  
+
 };
 
-export {register,login, refreshToken}
+const logout = (req:Request, res:Response) => {
+  try {
+    res.clearCookie("jwt", {
+      httpOnly: true,
+    });
+
+    return res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(500)
+  }
+};
+
+export {register,login, refreshToken, logout}

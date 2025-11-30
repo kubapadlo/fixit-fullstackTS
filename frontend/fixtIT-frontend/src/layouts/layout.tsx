@@ -6,6 +6,7 @@ import { Outlet } from "react-router-dom";
 import { useLoggedUserState } from "../store/userStore";
 
 import { useNavigate } from "react-router-dom";
+import { logout } from "../services/logout";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -18,6 +19,17 @@ export default function Layout() {
   };
 
   const isLoggedIn = useLoggedUserState((state) => state.isAuthenticated);
+  const logoutState = useLoggedUserState((state) => state.logout);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      logoutState();
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -38,7 +50,7 @@ export default function Layout() {
             </IconButton>
 
             {isLoggedIn ? (
-              <Button variant="outlined" color="inherit">
+              <Button variant="outlined" color="inherit" onClick={handleLogout}>
                 Wyloguj
               </Button>
             ) : (

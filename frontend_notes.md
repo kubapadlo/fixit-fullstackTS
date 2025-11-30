@@ -144,3 +144,28 @@ const onSubmit = (data: formFields) => {
 3. utworzenie formsa (useForm)
 4. podpiecie formsa (handleSubmit) i pól (register) do Zoda i RHF
 5. UX: Obsluga mutation.error i mutaion.isPending
+
+# Ustawianie stalych elementow na stronie np. navbar
+
+```ts
+// main.tsx
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      { path: "/", element: <HomePage /> },
+      { path: "/login", element: <LoginPage /> },
+    ],
+  },
+]);
+
+// Layout.tsx
+function Layout() {
+  return (
+    <div>
+      <Navbar />
+      <Outlet /> {/* Tutaj wstawi się HomePage lub LoginPage */}
+    </div>
+  );
+}
+```
