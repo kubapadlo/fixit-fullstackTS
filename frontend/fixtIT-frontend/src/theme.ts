@@ -1,50 +1,93 @@
+import { createTheme, alpha } from '@mui/material/styles';
 
-import { createTheme } from '@mui/material/styles';
+// Używamy "as const", aby TypeScript wiedział, że to konkretne stałe wartości
+const sharedSettings = {
+  shape: {
+    borderRadius: 16,
+  },
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontWeight: 800, letterSpacing: '-0.02em' },
+    h2: { fontWeight: 700, letterSpacing: '-0.01em' },
+    h6: { fontWeight: 600 },
+    button: { 
+      textTransform: 'none' as const, // <--- TUTAJ DODANO "as const"
+      fontWeight: 600 
+    },
+  },
+} as const; // Dodanie "as const" tutaj również pomaga zachować precyzyjne typy
 
-
-// Modern light theme
 export const lightTheme = createTheme({
-    palette: {
+  ...sharedSettings,
+  palette: {
     mode: 'light',
     primary: {
-        main: '#4A68FF', // modern blue
+      main: '#6366f1',
+      light: '#818cf8',
+      dark: '#4f46e5',
     },
     secondary: {
-        main: '#FF6B6B', // warm accent
+      main: '#ec4899',
     },
     background: {
-        default: '#F7F8FA',
-        paper: '#FFFFFF',
+      default: '#99c1e9ff',
+      paper: '#c0e4f0ff',
     },
-},
-    shape: {
-        borderRadius: 12,
+    text: {
+      primary: '#0f172a',
+      secondary: '#64748b',
     },
-        typography: {
-        fontFamily: 'Inter, sans-serif',
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          padding: '10px 24px',
+          boxShadow: 'none',
+          '&:hover': { boxShadow: '0px 4px 12px rgba(99, 102, 241, 0.2)' },
+        },
+      },
     },
+  },
 });
 
-
-// Modern dark theme
 export const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#6C8BFF',
-        },
-        secondary: {
-            main: '#FF7B7B',
-        },
-        background: {
-            default: '#0F1116',
-            paper: '#1A1C22',
-        },
+  ...sharedSettings,
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#818cf8',
+      light: '#a5b4fc',
+      dark: '#6366f1',
     },
-    shape: {
-        borderRadius: 12,
+    secondary: {
+      main: '#f472b6',
     },
-    typography: {
-        fontFamily: 'Inter, sans-serif',
+    background: {
+      default: '#020617',
+      paper: '#0f172a',
     },
+    text: {
+      primary: '#f1f5f9',
+      secondary: '#94a3b8',
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          padding: '10px 24px',
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          border: `1px solid ${alpha('#cbd5e1', 0.1)}`,
+        },
+      },
+    },
+  },
 });

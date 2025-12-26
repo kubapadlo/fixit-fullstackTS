@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom"
-import { useLoggedUserState } from "../store/userStore"
 import { api } from "../utils/api"
 import { isAxiosError } from "axios"
 

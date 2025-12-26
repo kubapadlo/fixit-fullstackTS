@@ -38,7 +38,7 @@ export function LoginPage() {
       setUser(data.user, data.accessToken);
 
       setTimeout(() => {
-        navigate("/home");
+        navigate("/");
       }, 1000);
     },
   });
