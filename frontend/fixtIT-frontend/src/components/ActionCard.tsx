@@ -5,6 +5,7 @@ import {
   ButtonBase,
   Paper,
   alpha,
+  Icon,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -13,9 +14,9 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import type { JSX } from "react";
 import { useLoggedUserState } from "../store/userStore";
+import { useNavigate } from "react-router-dom";
 
-// Definicja typu dla karty
-export interface CardConfig {
+interface CardConfig {
   id: number;
   title: string;
   icon: JSX.Element;
@@ -34,117 +35,99 @@ export const WELCOME_CARDS: CardConfig[] = [
   { id: 3, title: "Kontakt", icon: <ContactSupportIcon />, color: "#ed6c02" },
 ];
 
-interface ActionCardProps {
+interface CardProps {
   card: CardConfig;
   index: number;
 }
 
-export const ActionCard = ({ card, index }: ActionCardProps) => {
-  const isDisabled = !useLoggedUserState((state) => state.isAuthenticated);
+export const ActionCard = ({ card, index }: CardProps) => {
+  const isAuthenticated = useLoggedUserState((state) => state.isAuthenticated);
+  const isLocked = !isAuthenticated && (card.id === 1 || card.id === 2);
+  const navigate = useNavigate();
 
+  const handleCardClick = () => {
+    switch (card.id) {
+      case 2:
+        navigate("/showFaults"); // Zgłoś usterkę
+        break;
+      default:
+        console.warn("Nieznana karta:", card.id);
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={!isDisabled ? { scale: 1.02 } : {}}
+      whileHover={!isLocked ? { scale: 1.02 } : {}}
     >
       <ButtonBase
-        disabled={isDisabled}
-        onClick={() => alert(`Wybrano: ${card.title}`)}
+        disabled={isLocked}
+        onClick={!isLocked ? handleCardClick : undefined}
         sx={{
+          backgroundColor: "red",
+          height: 150,
           width: "100%",
-          borderRadius: 4,
-          overflow: "hidden",
-          display: "block",
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          px: 3,
+          bgcolor: isLocked ? "grey.100" : "background.paper",
+          borderRadius: 10,
+          overflow: "hidden", // wszystko poza boxem zostaje ucinane, nic nie wystaje
+          transition: "0.3s",
         }}
       >
-        <Paper
-          elevation={isDisabled ? 0 : 2}
+        {/* ikonka tło */}
+        <Box
           sx={{
-            p: 3,
-            height: 110,
-            display: "flex",
-            alignItems: "center",
-            gap: 3,
-            position: "relative",
-            overflow: "hidden",
-            bgcolor: isDisabled ? "grey.100" : "background.paper",
-            border: "1px solid",
-            borderColor: isDisabled ? "grey.300" : alpha(card.color, 0.2),
-            transition: "0.3s",
+            position: "absolute",
+            bottom: 3,
+            right: 3,
+            opacity: 0.2,
+            "& svg": { fontSize: 80 },
+            zIndex: 1, // dajemy ikonka na spód, zeby byla pod tekstem
           }}
         >
-          {/* Ikona w tle */}
-          <Box
+          {card.icon}
+        </Box>
+
+        {/* ikonka glowna */}
+        <Box
+          sx={{
+            width: 45,
+            height: 45,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: !isAuthenticated ? "grey.400" : card.color,
+            borderRadius: 3,
+            "& svg": { fontSize: 28 }, // rozmiar ikonki
+            marginRight: 1,
+          }}
+        >
+          {card.icon}
+        </Box>
+
+        {/* tekst */}
+        <Box sx={{ textAlign: "left" }}>
+          <Typography
+            variant="h5"
             sx={{
-              position: "absolute",
-              right: -10,
-              bottom: -10,
-              opacity: 0.08,
-              fontSize: 100,
-              color: card.color,
-              pointerEvents: "none",
-              display: "flex",
-              "& svg": { fontSize: "inherit" }, // Upewnia się, że ikona się skaluje
+              fontWeight: 800,
+              color: isLocked ? "grey.500" : "text.primary",
             }}
           >
-            {card.icon}
-          </Box>
+            {card.title}
+          </Typography>
 
-          {/* Główna Ikona */}
-          <Box
-            sx={{
-              width: 56,
-              height: 56,
-              borderRadius: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor: isDisabled ? "grey.400" : card.color,
-              color: "white",
-              flexShrink: 0,
-              boxShadow: isDisabled
-                ? "none"
-                : `0 4px 12px ${alpha(card.color, 0.4)}`,
-              "& svg": { fontSize: 32 },
-            }}
-          >
-            {card.icon}
-          </Box>
-
-          {/* Treść */}
-          <Box sx={{ textAlign: "left", zIndex: 1 }}>
-            <Typography
-              variant="h6"
-              fontWeight="800"
-              sx={{ color: isDisabled ? "text.disabled" : "grey.900" }}
-            >
-              {card.title}
-            </Typography>
-
-            {isDisabled ? (
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={0.5}
-                sx={{ color: "error.main" }}
-              >
-                <LockOutlinedIcon sx={{ fontSize: 16 }} />
-                <Typography variant="caption" fontWeight="700">
-                  Zaloguj się, aby odblokować
-                </Typography>
-              </Stack>
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", fontWeight: 500 }}
-              >
-                Kliknij, aby przejść
-              </Typography>
-            )}
-          </Box>
-        </Paper>
+          {isLocked && (
+            <Stack alignItems="center" direction={"row"} spacing={0.5}>
+              <LockOutlinedIcon sx={{ fontSize: 16 }} />
+              <Typography variant="caption">Najpierw się zaloguj</Typography>
+            </Stack>
+          )}
+        </Box>
       </ButtonBase>
     </motion.div>
   );

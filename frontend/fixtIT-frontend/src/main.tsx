@@ -19,6 +19,7 @@ import CheckAuth from "./components/CheckAuth.tsx";
 
 // react-router
 import Layout from "./layouts/layout.tsx";
+import { FaultsPage } from "./pages/FaultsPage.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       },
       { path: "/login", element: <LoginPage /> },
       { path: "/home", element: <Homepage /> },
+      { path: "/showFaults", element: <FaultsPage /> },
     ],
   },
 ]);

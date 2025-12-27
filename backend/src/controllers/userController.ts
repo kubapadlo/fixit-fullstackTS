@@ -82,9 +82,9 @@ const addFault = async(req:Request<{},{}, newFaultBody>, res:Response) => {
 const showFaults = async (req: Request, res:Response) => {
   try {
     const userID = req.user?.userId;
-
     const foundUser = await User.findById(userID)
         if(!foundUser){
+          console.log("dupa tu problem")
       return res.status(404).json({message: "User with this id does not exist!"})
     }
 

@@ -35,6 +35,7 @@ export interface MyJwtPayload extends JwtPayload {
 }
 
 
+// req.user
 declare global {
   namespace Express {
     interface Request {

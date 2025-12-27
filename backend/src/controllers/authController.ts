@@ -69,7 +69,7 @@ const login = async(req: Request,res: Response)=>{
     const accesToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: debugMode ? "5m" : "1m" } 
+      { expiresIn: debugMode ? "5m" : "5m" } 
     );
 
     const refreshToken = jwt.sign(
@@ -102,7 +102,7 @@ const refreshToken = async(req:Request, res:Response) => {
       return res.status(401).json({message: "Refresh token is not valid"})
     }
     const payload = decoded as MyJwtPayload;
-    const newAccessToken = jwt.sign({id: payload.id, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "5m" }  )
+    const newAccessToken = jwt.sign({userId: payload.userId, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "5m" }  )
 
     return res.status(200).json({accessToken: newAccessToken, user:{id: payload.userId, username:payload.username, role: payload.role}})
   })
