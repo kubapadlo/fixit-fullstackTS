@@ -34,7 +34,7 @@ const register = async (req: Request, res: Response) => {
       passwordHash: hashedPassword,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
-      role: "technician", // optional
+      role: "student", // optional
       location : newUser.location,  // optional
     });
 

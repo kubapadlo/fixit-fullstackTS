@@ -44,7 +44,7 @@ const addFault = async(req:Request<{},{}, newFaultBody>, res:Response) => {
   try {
     const userID = req.user?.userId;
 
-    const foundUser = User.findById(userID)
+    const foundUser = await User.findById(userID)
     if(!foundUser){
       return res.status(404).json({message: "User with this id doesnt exist!"})
     }
@@ -70,7 +70,6 @@ const addFault = async(req:Request<{},{}, newFaultBody>, res:Response) => {
       category: formdata.category,
       description: formdata.description,
       state: formdata.state,
-      review: formdata.review,
       imageURL,
       imageID
     })

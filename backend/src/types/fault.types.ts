@@ -5,7 +5,6 @@ export interface newFaultBody{
   category: string
   description: string;
   state?: string;
-  review?: string;
 }
 
 export interface IFault extends Document {

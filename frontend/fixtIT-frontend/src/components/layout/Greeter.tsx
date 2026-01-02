@@ -8,7 +8,7 @@ const Greeter = () => {
     <Typography alignSelf="center" textAlign="center" sx={{ lineHeight: 1.1 }}>
       {isAuthenticated && (
         <>
-          Welcome
+          Witaj
           <br />
           <strong>{user?.fullName}</strong>
         </>

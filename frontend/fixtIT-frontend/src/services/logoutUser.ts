@@ -2,7 +2,7 @@ import { api } from "../utils/api"
 import { isAxiosError } from "axios"
 
 
-export async function logout(){
+export async function logoutUser(){
     try {
         await api.get('api/auth/logout')
     } catch (error) {

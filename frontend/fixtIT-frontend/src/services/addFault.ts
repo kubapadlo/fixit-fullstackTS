@@ -2,16 +2,16 @@ import { isAxiosError } from 'axios';
 import { api } from '../utils/api';
 
 interface addFaultParms {
-    category?: string; // Opcjonalne zgodnie z formSchema Zod
-    description?: string; // Wymagane zgodnie z formSchema Zod
+    category: string;
+    description: string;
     image: File;
 }
 
 export async function addFault({ category, description, image }: addFaultParms) {
     try {
         const formData = new FormData();
-        formData.append("category", "Elektryk");
-        formData.append("description", "Test sztywny opis"); 
+        formData.append("category", category);
+        formData.append("description", description); 
         formData.append("image", image);
 
         const res = await api.post('/api/user/addFault',formData, {headers: {'Content-Type': 'multipart/form-data'}});

@@ -1,12 +1,35 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Input, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  Input,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { addFault } from "../services/addFault";
 import { useSnackbar } from "notistack";
 
+const categories = [
+  "Elektryk",
+  "Hydraulik",
+  "Murarz",
+  "Malarz",
+  "Stolarz",
+  "Ślusarz",
+];
+
 const formSchema = z.object({
+  description: z.string().min(1, "Opis jest wymagany"),
+  category: z.enum(categories),
   image: z.instanceof(File),
 });
 
@@ -21,6 +44,7 @@ const ReportFaultPage = () => {
       enqueueSnackbar("Usterka została dodana ✅", {
         variant: "success",
       });
+      reset(); // resetuje pola po sukcesie
     },
     onError: (error: any) => {
       enqueueSnackbar(
@@ -35,61 +59,154 @@ const ReportFaultPage = () => {
     mutation.mutate(data);
   };
 
-  const { control, handleSubmit, setValue } = useForm<formFields>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    register,
+    formState: { errors },
+    reset,
+  } = useForm<formFields>({
     resolver: zodResolver(formSchema),
   });
 
   return (
     <Box
-      component="form"
-      encType="multipart/form-data"
-      onSubmit={handleSubmit(onSubmit)}
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 2,
+      }}
     >
-      <Controller
-        name="image" // nazwa pliku ze schematu zoda
-        control={control} // polaczenie Controllera z konkretnym formularzem
-        render={({ field: { onChange, value, ...field } }) => {
-          // render tlumaczy RHF jak podlaczyc sie i pobierac wartosci z naszych niestandardowych komponentow
-          // field to zestaw narzedzi ktory dostajemy od RHF do pracy z Controller
-          // destrukuturyzujac ten obiekt wybieramy narzedzia, ktore chcemy dostosowac pod siebie (onChange, value) a reszte zostawiamy defaultowo (...field)
-          // value - to co aktulanie jest w polu TYLKO DO ODCZYTU, nie mozna modyfikowac value
-          return (
-            <Box>
-              <Input
-                type="file"
-                sx={{ display: "none" }} // Ukrywamy domyślny input bo jest brzydki
-                id="file-upload-button" // nadanie unikalnego ID, konieczne do polaczeneie z innym elementem
-                {...field}
-                onChange={(e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (file) {
-                    setValue("image", file); // Mówimy RHF: "do pola 'image' wstaw ten plik!"
-                  }
-                }}
-              ></Input>
-              {/* Kliknięcie na <label> symuluje kliknięcie na <input>
-                Dzięki temu, chodź input jest niewidoczny, jego funkcjonalność nadal działa */}
-              <label
-                htmlFor="file-upload-button" /* powiazanie z innym elementem o danym ID */
-              >
-                <Button variant="contained" component="span">
-                  {value ? "Zmień plik" : "Wybierz plik"}
-                </Button>
-              </label>
-
-              {value && <p>Wybrany plik: {value.name}</p>}
-            </Box>
-          );
+      <Paper
+        elevation={6} // Większy cień dla lepszego wyglądu
+        sx={{
+          width: { xs: "100%", sm: 400, md: 500 }, // Responsywna szerokość
+          maxWidth: "100%",
+          padding: 3, // Większy padding
+          borderRadius: 2, // Zaokrąglone rogi
         }}
-      ></Controller>
-
-      <Button type="submit">klik</Button>
-
-      {mutation.isError && (
-        <Typography color="error" variant="body1" sx={{ mt: 2 }}>
-          Błąd: {mutation.error?.message || "Wystąpił nieznany błąd."}
+      >
+        {" "}
+        <Typography
+          variant="h5"
+          component="h1"
+          gutterBottom
+          align="center"
+          mb={3}
+        >
+          Zgłoś Usterkę
         </Typography>
-      )}
+        <Box
+          component="form"
+          encType="multipart/form-data"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              placeholder="Opis usterki..."
+              id="description"
+              label="Opis usterki..."
+              {...register("description")}
+              error={!!errors.description}
+              helperText={errors.description ? errors.description.message : ""}
+            ></TextField>
+
+            <FormControl fullWidth error={!!errors.category}>
+              <InputLabel id="category-label">Kategoria</InputLabel>{" "}
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    labelId="category-label"
+                    id="category"
+                    label="Kategoria"
+                    {...field}
+                  >
+                    {categories.map((category) => (
+                      <MenuItem key={category} value={category}>
+                        {category}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+              {errors.category && (
+                <Typography color="error" variant="caption">
+                  {errors.category.message}
+                </Typography>
+              )}
+            </FormControl>
+
+            <Controller
+              name="image"
+              control={control}
+              render={({ field: { onChange, value, ...field } }) => {
+                return (
+                  <Box>
+                    <Input
+                      type="file"
+                      sx={{ display: "none" }}
+                      id="file-upload-button"
+                      {...field}
+                      onChange={(e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          setValue("image", file);
+                        }
+                      }}
+                    ></Input>
+                    <label htmlFor="file-upload-button">
+                      <Button variant="contained" component="span" fullWidth>
+                        {value ? "Zmień zdjęcie" : "Wybierz zdjęcie"}
+                      </Button>
+                    </label>
+
+                    {value && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 1, ml: 1 }}
+                      >
+                        Wybrany plik: {value.name}
+                      </Typography>
+                    )}
+                    {errors.image && (
+                      <Typography
+                        color="error"
+                        variant="caption"
+                        sx={{ mt: 1, ml: 1.4 }}
+                      >
+                        {errors.image.message}
+                      </Typography>
+                    )}
+                  </Box>
+                );
+              }}
+            ></Controller>
+
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={mutation.isPending}
+              size="large"
+            >
+              {mutation.isPending ? "Czekaj..." : "Zgłoś"}
+            </Button>
+          </Stack>
+
+          {mutation.isError && (
+            <Typography color="error" variant="body1" sx={{ mt: 2 }}>
+              Błąd: {mutation.error?.message || "Wystąpił nieznany błąd."}
+            </Typography>
+          )}
+        </Box>
+      </Paper>
     </Box>
   );
 };
