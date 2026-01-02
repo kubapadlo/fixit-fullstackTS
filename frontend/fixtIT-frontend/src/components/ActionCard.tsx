@@ -32,7 +32,7 @@ export const WELCOME_CARDS: CardConfig[] = [
     color: "#1976d2",
   },
   { id: 2, title: "Moje Usterki", icon: <ListAltIcon />, color: "#2e7d32" },
-  { id: 3, title: "Kontakt", icon: <ContactSupportIcon />, color: "#ed6c02" },
+  //  { id: 3, title: "Kontakt", icon: <ContactSupportIcon />, color: "#ed6c02" },
 ];
 
 interface CardProps {
@@ -47,6 +47,9 @@ export const ActionCard = ({ card, index }: CardProps) => {
 
   const handleCardClick = () => {
     switch (card.id) {
+      case 1:
+        navigate("/report"); // Zgłoś usterkę
+        break;
       case 2:
         navigate("/showFaults"); // Zgłoś usterkę
         break;

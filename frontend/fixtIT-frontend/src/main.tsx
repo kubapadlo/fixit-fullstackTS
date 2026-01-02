@@ -17,9 +17,14 @@ import { lightTheme, darkTheme } from "./theme.ts";
 
 import CheckAuth from "./components/CheckAuth.tsx";
 
+import { SnackbarProvider } from "notistack";
+
 // react-router
 import Layout from "./layouts/layout.tsx";
 import { FaultsPage } from "./pages/FaultsPage.tsx";
+import ReportFaultPage from "./pages/ReportFaultPage.tsx";
+import RegisterPage from "./pages/RegisterPage.tsx";
+import NotFoundPage from "./pages/NotFoundPage.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,8 +39,11 @@ const router = createBrowserRouter([
         element: <WelcomePage />,
       },
       { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
       { path: "/home", element: <Homepage /> },
       { path: "/showFaults", element: <FaultsPage /> },
+      { path: "/report", element: <ReportFaultPage /> },
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);
@@ -60,9 +68,15 @@ function AppThemeProvider({ children }: { children: React.ReactNode }) {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AppThemeProvider>
-        <RouterProvider router={router} />
-      </AppThemeProvider>
+      <SnackbarProvider
+        maxSnack={3}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        autoHideDuration={4000}
+      >
+        <AppThemeProvider>
+          <RouterProvider router={router} />
+        </AppThemeProvider>
+      </SnackbarProvider>
     </QueryClientProvider>
   </StrictMode>
 );

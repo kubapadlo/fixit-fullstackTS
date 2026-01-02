@@ -19,6 +19,7 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "axios": "^1.13.2",
     "framer-motion": "^12.23.26",
+    "notistack": "^3.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.66.0",

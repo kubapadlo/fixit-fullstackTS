@@ -169,3 +169,58 @@ function Layout() {
   );
 }
 ```
+
+## RHF Component
+
+```tsx
+const ReportFaultPage = () => {
+  const { control, handleSubmit, setValue } = useForm<formFields>({
+    resolver: zodResolver(formSchema),
+  });
+  return (
+    <Box
+      component="form"
+      encType="multipart/form-data"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Controller
+        name="image" // nazwa pliku ze schematu zoda
+        control={control} // polaczenie Controllera z konkretnym formularzem
+        render={({ field: { onChange, value, ...field } }) => {
+          // render tlumaczy RHF jak podlaczyc sie i pobierac wartosci z niestandardowych komponentow
+          // field to zestaw narzedzi ktory dostajemy od RHF do pracy z Controller
+          // destrukuturyzujac ten obiekt wybieramy narzedzia, ktore chcemy dostosowac pod siebie (onChange, value) a reszte zostawiamy defaultowo (...field)
+          // value - to co aktulanie jest w polu
+          return (
+            <Box>
+              <Input
+                type="file"
+                sx={{ display: "none" }} // Ukrywamy domyślny input bo jest brzydki
+                id="file-upload-button" // nadanie unikalnego ID, konieczne do polaczeneie z innym elementem
+                {...field}
+                onChange={(e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    setValue("image", file); // Mówimy RHF: "do pola 'image' wstaw ten plik!"
+                  }
+                }}
+              ></Input>
+              {/* Kliknięcie na <label> symuluje kliknięcie na <input>
+                Dzięki temu, chodź input jest niewidoczny, jego funkcjonalność nadal działa */}
+              <label
+                htmlFor="file-upload-button" /* powiazanie z innym elementem o danym ID */
+              >
+                <Button variant="contained" component="span">
+                  {value ? "Zmień plik" : "Wybierz plik"}
+                </Button>
+              </label>
+
+              {value && <p>Wybrany plik: {value.name}</p>}
+            </Box>
+          );
+        }}
+      ></Controller>
+    </Box>
+  );
+};
+```

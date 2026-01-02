@@ -3,10 +3,6 @@ import { IUser } from "../types/user.types";
 import Joi from "joi";
 
 const userSchema: Schema<IUser> = new Schema({
-  username: {
-    type: String,
-    required: [true, "username is required"],
-  },
   email: {
     type: String,
     required: [true, "email is required"],
@@ -19,6 +15,14 @@ const userSchema: Schema<IUser> = new Schema({
     type: String,
     enum: ["student", "technician", "admin"],
     default: "student"
+  },
+  firstName: {
+    type: String,
+    required: [true, "firstName is required"],
+  },
+  lastName: {
+    type: String,
+    required: [true, "lastName is required"],
   },
   location: {
     dorm: {type: String},
@@ -38,10 +42,11 @@ export const userLoginValidationSchema = {
 
 export const userRegisterValidationSchema = {
   body: Joi.object({
-    username: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.string().required(),
     role: Joi.string().valid("student", "technician", "admin").default("student"),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
     location: Joi.object({
       dorm: Joi.string(),
       room: Joi.string()

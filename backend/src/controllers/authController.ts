@@ -16,7 +16,7 @@ const register = async (req: Request, res: Response) => {
   try {
     const newUser = req.body as RegisterRequestBody;
     
-    if (!newUser?.email || !newUser?.password || !newUser?.username) {
+    if (!newUser?.email || !newUser?.password || !newUser?.firstName || !newUser?.lastName) {
       return res.status(400).json({ message: "No user data in request body" });
     }
 
@@ -30,10 +30,11 @@ const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(newUser.password, 10);
     
     const createdUser = await User.create({
-      username: newUser.username,
       email: newUser.email,
       passwordHash: hashedPassword,
-      role: newUser.role, // optional
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      role: "technician", // optional
       location : newUser.location,  // optional
     });
 
@@ -73,7 +74,7 @@ const login = async(req: Request,res: Response)=>{
     );
 
     const refreshToken = jwt.sign(
-      { userId: user._id, username: user.username, role:user.role }, 
+      { userId: user._id, role:user.role }, 
       process.env.SECRET_REFRESH_KEY as string, 
       { expiresIn: "15m" } 
     );
@@ -82,8 +83,8 @@ const login = async(req: Request,res: Response)=>{
       httpOnly: true, // Niedostępne dla JavaScript, ochrona przed XSS
       maxAge: 15 * 1000 * 1000,
     });
-
-    return res.status(200).json({user:{id: user._id, username: user.username, role:user.role}, accessToken: accesToken, message: "Logged sucessfuly"})
+      
+    return res.status(200).json({user:{id: user._id, role:user.role, fullName: `${user.firstName} ${user.lastName}`}, accessToken: accesToken, message: "Logged sucessfuly"})
     
   } catch (error) {
     return res.status(500).json({message: "Server error while logging"})
@@ -97,14 +98,18 @@ const refreshToken = async(req:Request, res:Response) => {
     return res.status(401).json({message: "No refresh token in cookie"})
   }
 
-  jwt.verify(rtoken, process.env.SECRET_REFRESH_KEY as string, (err:any, decoded:any)=>{
+  jwt.verify(rtoken, process.env.SECRET_REFRESH_KEY as string, async(err:any, decoded:any)=>{
     if(err){
       return res.status(401).json({message: "Refresh token is not valid"})
     }
     const payload = decoded as MyJwtPayload;
+    const user = await User.findById(payload.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const newAccessToken = jwt.sign({userId: payload.userId, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "5m" }  )
 
-    return res.status(200).json({accessToken: newAccessToken, user:{id: payload.userId, username:payload.username, role: payload.role}})
+    return res.status(200).json({accessToken: newAccessToken, user:{id: payload.userId, role: payload.role, fullName: `${user.firstName} ${user.lastName}`}})
   })
   } catch (error) {
     return res.status(500).json({message: "Internal Server Error"})

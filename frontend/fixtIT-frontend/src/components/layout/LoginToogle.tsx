@@ -11,7 +11,12 @@ const LoginToogle = () => {
 
   if (isAuthenicated) {
     return (
-      <Button variant="contained" onClick={logout} startIcon={<LogoutIcon />}>
+      <Button
+        sx={{ ":hover": { transition: "0.2s", transform: "scale(1.03)" } }}
+        variant="contained"
+        onClick={logout}
+        startIcon={<LogoutIcon />}
+      >
         Wyloguj
       </Button>
     );
@@ -21,9 +26,13 @@ const LoginToogle = () => {
         variant="contained"
         onClick={() => navigate("/login")}
         startIcon={<LoginIcon />}
-        sx={{ fontWeight: "70bobold" }}
+        sx={{
+          transition: "0.2s",
+          ":hover": { transform: "scale(1.03)" },
+          ":active": { transform: "scale(0.97)" },
+        }}
       >
-        Zaloguj
+        Logowanie
       </Button>
     );
   }

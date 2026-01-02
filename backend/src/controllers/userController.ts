@@ -62,9 +62,12 @@ const addFault = async(req:Request<{},{}, newFaultBody>, res:Response) => {
       }
     }
 
+    console.log(req.body)
+
     const newFault = await Fault.create({
       reportedAt: Date.now(),
       reportedBy: userID,
+      category: formdata.category,
       description: formdata.description,
       state: formdata.state,
       review: formdata.review,
@@ -83,8 +86,7 @@ const showFaults = async (req: Request, res:Response) => {
   try {
     const userID = req.user?.userId;
     const foundUser = await User.findById(userID)
-        if(!foundUser){
-          console.log("dupa tu problem")
+    if(!foundUser){
       return res.status(404).json({message: "User with this id does not exist!"})
     }
 

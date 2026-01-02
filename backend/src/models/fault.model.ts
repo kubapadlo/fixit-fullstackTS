@@ -13,6 +13,11 @@ const faultSchema : Schema<IFault> = new Schema({
     default: Date.now,
     required: [true, "report date is required"]
   },
+  category: {
+    type: String,
+    enum: ['Elektryk', 'Hydraulik', 'Murarz', 'Malarz', 'Stolarz', 'Ślusarz'],
+    default: 'reported'
+  },
   description: {
     type: String,
     required: [true, "Description is required"]
@@ -41,6 +46,7 @@ export const Fault : Model<IFault> = mongoose.model<IFault>("Fault", faultSchema
 export const newFaultSchema = {
   body: Joi.object({
     reportedAt: Joi.date().default(()=> new Date()),
+    category: Joi.string().valid('Elektryk', 'Hydraulik', 'Murarz', 'Malarz', 'Stolarz', 'Ślusarz').default(''),
     description: Joi.string().required(),
     state: Joi.string().valid('reported', 'fixed').default('reported'),
     review: Joi.string().allow('').optional(),

@@ -31,8 +31,8 @@ export function WelcomePage() {
             variant="h5"
             sx={{ color: "text.secondary", maxWidth: 480, fontWeight: 400 }}
           >
-            Profesjonalny system zarządzania usterkami. Zgłaszaj, śledź i
-            naprawiaj w jednym miejscu.
+            Profesjonalny system zarządzania usterkami w akademiku. Zgłaszaj,
+            śledź i naprawiaj w jednym miejscu.
           </Typography>
         </Box>
       </Grid>

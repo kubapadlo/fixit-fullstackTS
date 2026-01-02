@@ -14,7 +14,7 @@ import {multerErrorHandler} from "../middleware/multerErrorHandler.js"
 
 const userRouter = Router();
 
-userRouter.post("/addFault", verifyJWT, verifyRole("student"), upload, multerErrorHandler, validate(newFaultSchema), addFault);
+userRouter.post("/addFault", verifyJWT, upload, multerErrorHandler, validate(newFaultSchema), addFault);
 userRouter.get("/showFaults", verifyJWT, showFaults);
 userRouter.put('/:faultID/edit', verifyJWT, upload, validate(editFaultSchema), editFault)
 userRouter.put('/:faultID/review', verifyJWT, validate(addReviewSchema), addReview)

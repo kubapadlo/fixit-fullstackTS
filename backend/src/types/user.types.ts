@@ -1,11 +1,23 @@
 import { JwtPayload } from 'jsonwebtoken';
 import {Document} from 'mongoose'
 
+export interface IUser extends Document {
+  email: string;
+  passwordHash: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  location?: {
+    dorm: string;
+    room: string;
+  };
+}
+
 export interface RegisterRequestBody {
-  username: string;
   email: string;
   password: string;
-  role: string;
+  firstName: string;
+  lastName: string;
   location? : {
     dorm: string,
     room: string
@@ -17,20 +29,8 @@ export interface LoginRequestBody {
   password: string;
 }
 
-export interface IUser extends Document {
-  username: string;
-  email: string;
-  passwordHash: string;
-  role: string;
-  location?: {
-    dorm: string;
-    room: string;
-  };
-}
-
 export interface MyJwtPayload extends JwtPayload {
   userId: string;
-  username?: string
   role: string
 }
 

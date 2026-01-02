@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLoggedUserState } from "../store/userStore";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, Box, Stack, Alert } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 
 const formSchema = z.object({
   email: z.email(),
@@ -34,7 +35,9 @@ export function LoginPage() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      console.log(data);
+      enqueueSnackbar("Udało się zalogować", {
+        variant: "success",
+      });
       setUser(data.user, data.accessToken);
 
       setTimeout(() => {

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import getFaults from "../services/getFaults";
 import { useLoggedUserState } from "../store/userStore";
+import FaultCard from "../components/FaultCard";
+import { Box } from "@mui/material";
 
 export const FaultsPage = () => {
   const token = useLoggedUserState((state) => state.accessToken);
@@ -15,10 +17,20 @@ export const FaultsPage = () => {
   if (isError || !data) return <div>Błąd pobierania danych</div>;
 
   return (
-    <div>
+    <Box sx={{ display: "flex", flexWrap: "wrap", p: 2 }}>
       {data.map((fault) => (
-        <div key={fault._id}>{fault.description}</div>
+        <FaultCard
+          key={fault._id} // Pamiętaj o unikalnym kluczu dla każdego elementu w map
+          category={fault.category}
+          description={fault.description}
+          reportedAt={fault.reportedAt} // Przekazujemy stringa, formatowanie w FaultCard
+          state={fault.state}
+          imageURL={fault.imageURL}
+          onDelete={() => {}}
+          onEdit={() => {}}
+          id={fault._id}
+        />
       ))}
-    </div>
+    </Box>
   );
 };
