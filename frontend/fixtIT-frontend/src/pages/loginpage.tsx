@@ -5,12 +5,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useLoggedUserState } from "../store/userStore";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Box, Stack, Alert } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  Stack,
+  Alert,
+  Typography,
+} from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 
 const formSchema = z.object({
-  email: z.email(),
-  password: z.string().min(3, "At least 3 characters"),
+  email: z.email("Email jest wymagany"),
+  password: z.string().min(4, "Hasło musi zawierać conajmniej 4 znaku"),
 });
 
 type formFields = z.infer<typeof formSchema>;
@@ -39,10 +46,7 @@ export function LoginPage() {
         variant: "success",
       });
       setUser(data.user, data.accessToken);
-
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
+      navigate("/");
     },
   });
 
@@ -67,6 +71,9 @@ export function LoginPage() {
       }}
     >
       <Stack spacing={2}>
+        <Typography variant="h5" textAlign="center">
+          Logowanie
+        </Typography>
         {/* Email */}
         <TextField
           label="Email"
@@ -80,9 +87,9 @@ export function LoginPage() {
 
         {/* Password */}
         <TextField
-          label="Password"
+          label="Hasło"
           type="password"
-          placeholder="Password"
+          placeholder="Hasło"
           {...register("password")}
           error={!!errors.password} // pokazuje czerwone obramowanie przy błędzie
           helperText={errors.password?.message} // pod polem wyświetla komunikat błędu validacji ZODA
@@ -100,13 +107,9 @@ export function LoginPage() {
           Click me
         </Button>
 
-        {/* Backend errors */}
         {mutation.isError && (
           <Alert severity="error">{(mutation.error as Error).message}</Alert>
         )}
-
-        {/* Zod root error
-        {errors.root && <Alert severity="error">{errors.root.message}</Alert>}*/}
       </Stack>
     </Box>
   );

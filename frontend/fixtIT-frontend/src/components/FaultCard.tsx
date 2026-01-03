@@ -11,15 +11,14 @@ import {
 } from "@mui/material";
 
 interface FaultCardProps {
+  id: string; // Zakładamy, że karta zawsze ma ID
   reportedAt?: string;
   category: string;
   description: string;
   state?: string;
   imageURL?: string;
   onDelete?: (id: string) => void; // Zmieniamy typ, aby przekazywać ID
-  onEdit?: (id: string) => void; // Zmieniamy typ, aby przekazywać ID
   onCardClick?: (id: string) => void; // Nowy prop: co ma się stać po kliknięciu karty
-  id: string; // Zakładamy, że karta zawsze ma ID
 }
 
 const FaultCard = (props: FaultCardProps) => {
@@ -47,7 +46,7 @@ const FaultCard = (props: FaultCardProps) => {
         <CardContent>
           {/* Kategoria jako tytuł */}
           <Typography gutterBottom variant="h6" component="div">
-            {props.category}
+            Kategoria: {props.category}
           </Typography>
           {/* Opis */}
           <Typography variant="body2" color="text.secondary">
@@ -97,15 +96,10 @@ const FaultCard = (props: FaultCardProps) => {
       </CardActionArea>
 
       {/* Akcje karty: Przyciski poza CardActionArea */}
-      {(props.onEdit || props.onDelete) && (
+      {props.onDelete && (
         <CardActions
           sx={{ justifyContent: "flex-end", borderTop: "1px solid #eee" }}
         >
-          {props.onEdit && (
-            <Button size="small" onClick={() => props.onEdit!(props.id)}>
-              Edytuj
-            </Button>
-          )}
           {props.onDelete && (
             <Button
               size="small"

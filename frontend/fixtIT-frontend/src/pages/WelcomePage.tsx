@@ -7,7 +7,12 @@ export function WelcomePage() {
     <Grid
       container
       spacing={6}
-      sx={{ py: 8, px: 3, minHeight: "80vh", alignItems: "center" }}
+      sx={{
+        py: 8,
+        px: 3,
+        minHeight: "100vh",
+        alignItems: "center",
+      }}
     >
       {/* Lewa strona: Powitanie */}
       <Grid size={{ xs: 12, md: 7 }}>

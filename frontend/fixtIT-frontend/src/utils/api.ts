@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { useLoggedUserState } from '../store/userStore';
-import { enqueueSnackbar } from "notistack";
 
 export const api = axios.create({
   baseURL: "http://localhost:5000", // pamietamy o http

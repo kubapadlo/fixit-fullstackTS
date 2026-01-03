@@ -18,7 +18,7 @@ export interface RegisterRequestBody {
   password: string;
   firstName: string;
   lastName: string;
-  location? : {
+  location : {
     dorm: string,
     room: string
   };

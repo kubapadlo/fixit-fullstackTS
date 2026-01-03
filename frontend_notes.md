@@ -224,3 +224,18 @@ const ReportFaultPage = () => {
   );
 };
 ```
+
+# Zwracaj tylko to, co klient faktycznie potrzebuje. Reszta zostaje na backendzie.
+
+### To jest blad nie zwracamy calego obiektu bo zaweria on poufne info jak ID i hasło
+
+```ts
+const createdUser = await User.create({
+  email: newUser.email,
+  passwordHash: hashedPassword,
+});
+
+return res
+  .status(201)
+  .json({ createdUser, message: "User created successfuly" }); // !!! BŁĄD
+```

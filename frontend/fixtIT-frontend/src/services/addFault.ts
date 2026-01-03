@@ -4,7 +4,7 @@ import { api } from '../utils/api';
 interface addFaultParms {
     category: string;
     description: string;
-    image: File;
+    image?: File;
 }
 
 export async function addFault({ category, description, image }: addFaultParms) {
@@ -12,8 +12,10 @@ export async function addFault({ category, description, image }: addFaultParms) 
         const formData = new FormData();
         formData.append("category", category);
         formData.append("description", description); 
-        formData.append("image", image);
-
+        if(image){
+            formData.append("image", image);
+        }
+    
         const res = await api.post('/api/user/addFault',formData, {headers: {'Content-Type': 'multipart/form-data'}});
         return res.data;
     } catch (error) {

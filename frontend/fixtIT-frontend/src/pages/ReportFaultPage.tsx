@@ -29,8 +29,8 @@ const categories = [
 
 const formSchema = z.object({
   description: z.string().min(1, "Opis jest wymagany"),
-  category: z.enum(categories),
-  image: z.instanceof(File),
+  category: z.enum(categories, "Musisz wybrać kategorię"),
+  image: z.instanceof(File).optional(),
 });
 
 type formFields = z.infer<typeof formSchema>;

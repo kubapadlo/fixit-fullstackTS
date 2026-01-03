@@ -3,6 +3,9 @@ import  {register,login, refreshToken, logout}  from "../controllers/authControl
 
 // @ts-ignore
 import {validate} from "../middleware/validate.js"
+// @ts-ignore
+import {verifyRole} from "../middleware/verifyRole.js"
+
 import { userLoginValidationSchema, userRegisterValidationSchema } from "../models/user.model";
 
 const authRouter = Router();

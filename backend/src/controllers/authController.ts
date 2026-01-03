@@ -27,6 +27,15 @@ const register = async (req: Request, res: Response) => {
         .json({ message: "User with this email already exists" });
     }
 
+    // 2. Sprawdzenie, ile osób ma już zarejestrowaną tę lokalizację
+    const usersInLocationCount = await User.countDocuments({ location: newUser.location });
+
+    if (usersInLocationCount >= 2) { // Jeśli już 2 lub więcej użytkowników ma tę lokalizację
+      return res
+        .status(400)
+        .json({ message: `Pokój ${newUser.location.dorm} ${newUser.location.room} został już przypisany do maksymalnej liczby osób(2). Skontaktuj się z administratorem.` });
+    }
+
     const hashedPassword = await bcrypt.hash(newUser.password, 10);
     
     const createdUser = await User.create({
@@ -35,12 +44,12 @@ const register = async (req: Request, res: Response) => {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       role: "student", // optional
-      location : newUser.location,  // optional
+      location : newUser.location, 
     });
 
     return res
       .status(201)
-      .json({ createdUser, message: "User created successfuly" });
+      .json({ message: "User created successfuly" });
   } catch (error: any) {
     return res.status(500).json({ message: "Cant add user: " + error.message });
   }
@@ -60,7 +69,7 @@ const login = async(req: Request,res: Response)=>{
     if(!user){
       return res.status(404).json({message: "User not found, please login first"})
     }
-    
+
     const isValid = await bcrypt.compare(loginData.password, user.passwordHash);
 
     if(!isValid){
@@ -70,13 +79,13 @@ const login = async(req: Request,res: Response)=>{
     const accesToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: debugMode ? "5m" : "5m" } 
+      { expiresIn: debugMode ? "1m" : "1m" } 
     );
 
     const refreshToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_REFRESH_KEY as string, 
-      { expiresIn: "15m" } 
+      { expiresIn: "30m" } 
     );
 
     res.cookie("jwt", refreshToken, {
@@ -107,7 +116,7 @@ const refreshToken = async(req:Request, res:Response) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const newAccessToken = jwt.sign({userId: payload.userId, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "5m" }  )
+    const newAccessToken = jwt.sign({userId: payload.userId, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "1m" }  )
 
     return res.status(200).json({accessToken: newAccessToken, user:{id: payload.userId, role: payload.role, fullName: `${user.firstName} ${user.lastName}`}})
   })
