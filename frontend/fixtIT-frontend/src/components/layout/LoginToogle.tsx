@@ -4,16 +4,17 @@ import { Button } from "@mui/material";
 import { useLoggedUserState } from "../../store/userStore";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../../services/logoutUser";
+import { useMutation } from "@tanstack/react-query";
 
 const LoginToogle = () => {
   const isAuthenicated = useLoggedUserState((state) => state.isAuthenticated);
   const logout = useLoggedUserState((state) => state.logout);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/");
+  const handleLogout = async () => {
+    await logoutUser(); // funkcja async
     logout();
+    navigate("/");
   };
 
   if (isAuthenicated) {

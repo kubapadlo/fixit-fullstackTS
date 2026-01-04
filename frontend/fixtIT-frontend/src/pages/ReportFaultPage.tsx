@@ -41,7 +41,7 @@ const ReportFaultPage = () => {
   const mutation = useMutation({
     mutationFn: addFault,
     onSuccess: () => {
-      enqueueSnackbar("Usterka została dodana ✅", {
+      enqueueSnackbar("Usterka została dodana", {
         variant: "success",
       });
       reset(); // resetuje pola po sukcesie
@@ -49,7 +49,7 @@ const ReportFaultPage = () => {
     onError: (error: any) => {
       enqueueSnackbar(
         error.response.data.message ||
-          "Wystąpił błąd podczas dodawania usterki ❌", // error.response.data.message
+          "Wystąpił błąd podczas dodawania usterki",
         { variant: "error" }
       );
     },

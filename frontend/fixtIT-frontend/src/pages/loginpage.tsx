@@ -42,11 +42,12 @@ export function LoginPage() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      enqueueSnackbar("Udało się zalogować", {
+      enqueueSnackbar(`Udało się zalogować jako ${data.user.role}`, {
         variant: "success",
       });
       setUser(data.user, data.accessToken);
-      navigate("/");
+      if (data.user.role === "technician") navigate("/dashboard");
+      else navigate("/");
     },
   });
 

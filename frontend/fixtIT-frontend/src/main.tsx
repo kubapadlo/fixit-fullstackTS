@@ -6,7 +6,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 import { LoginPage } from "./pages/LoginPage.tsx";
-import Homepage from "./pages/HomePage.tsx";
 import { WelcomePage } from "./pages/WelcomePage.tsx";
 
 import { useThemeStore } from "./store/themeStore.ts";
@@ -25,6 +24,8 @@ import { FaultsPage } from "./pages/FaultsPage.tsx";
 import ReportFaultPage from "./pages/ReportFaultPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
+import DashboardPage from "./pages/DashboardPage.tsx";
+import RequireRole from "./components/guards/RequireRole.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -40,9 +41,14 @@ const router = createBrowserRouter([
       },
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
-      { path: "/home", element: <Homepage /> },
       { path: "/showFaults", element: <FaultsPage /> },
       { path: "/report", element: <ReportFaultPage /> },
+
+      // 🔐 TYLKO ROLE
+      {
+        element: <RequireRole allowedRoles={["technician"]} />,
+        children: [{ path: "/dashboard", element: <DashboardPage /> }],
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
@@ -51,7 +57,7 @@ const router = createBrowserRouter([
 //react-query
 const queryClient = new QueryClient();
 
-//
+// color-theme
 function AppThemeProvider({ children }: { children: React.ReactNode }) {
   const theme = useThemeStore((state) => state.theme);
 

@@ -239,3 +239,166 @@ return res
   .status(201)
   .json({ createdUser, message: "User created successfuly" }); // !!! BŁĄD
 ```
+
+## navigate() vs wpisanie URL z palca
+
+Wpisanie URL z palca = pełne odświeżenie aplikacji
+
+navigate() / Link = zmiana widoku bez resetu stanu
+
+## fajna gatka
+
+`https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221q62byAGZkYo8G0sjZWYW1CWt4NEOMvk2%22%5D,%22action%22:%22open%22,%22userId%22:%22103499335488266027912%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing`
+
+## asynchronicznosc
+
+```ts
+// BŁĘDNIE
+const handleLogout = () => {
+  logoutUser(); // funkcja async api usuwajaca ciasteczko z tokenem
+  setUser(null, null); // stan globalny
+};
+```
+
+## BŁĄD: setUser() wywola sie odrazu nie czekajac na zakonczenie async funkcji 'logoutUser()'. setUser() wyzeruje stan globalyn ale ciasteczko dalej bedzie wiec CheckAuth moze go przywrocic - BŁĄD!!!
+
+```ts
+// POPRAWNIE
+const handleLogout = async () => {
+  await logoutUser(); // funkcja async
+  setUser(null, null);
+};
+```
+
+## Istotne luki czasowe miedzy Isloading==false, a wywoalniem useEffect()
+
+```ts
+//main.tsx
+<CheckAuth>     // oplata całą aplikacje
+  <RouterProvider router={router} />
+</CheckAuth>
+
+{
+  element: <RequireRole allowedRoles={["technician"]} />, // RequireRole sprawdza stan globalny
+  children: [{ path: "/dashboard", element: <DashboardPage /> }],
+},
+
+
+// CheckAuth.tsx
+export default function CheckAuth({ children }: { children: React.ReactNode }) {
+  const { data, isLoading,isSuccess, } = useQuery({
+    queryFn: refresh,
+  });
+
+  // Ustawiamy usera w stanie globalnym
+  useEffect(() => {
+    if (isSuccess && data) {
+      setUser(data.user, data.accessToken);
+    }
+  }, [isSuccess, data, setUser]);
+
+  // jesli dalej pobieranie z api
+  if (isLoading) {
+    return ( kolko_ladowania...)
+  }
+
+  // jesli skoczylo sie pobieranie z serwera
+  return <>{children}</>;
+}
+
+```
+
+Problem: Mimo ze dane zostaly juz pobrane z API (isLoading=false => render<>{children}</>(RequireRole) => RequireRole sprawdza stan globalny ktory jest dalej pusty)
+
+useEffect w CheckAuth jeszcze nie zdążył zadziałać(**działa on po fazie renderowania komponentu**).
+Oznacza to, że w momencie, gdy RequireRole jest renderowane, setUser JESZCZE NIE ZOSTAŁO WYWOŁANE. Stan globalny user jest nadal null.
+
+Problem jest ten ulamek czasu miedzy zakonczeniem pobierania z serwera a wykonaniu sie useEffect
+
+### Rozwiazanie
+
+```tsx
+export default function CheckAuth({ children }: { children: React.ReactNode }) {
+  const { user, setUser, logout } = useLoggedUserState();
+
+  const authCheckAttempted = useRef(false); // proba zmianu stanu globalnego
+
+  const { data, isLoading, isError, isSuccess, error } = useQuery({
+    queryFn: refresh,
+  });
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      setUser(data.user, data.accessToken);
+    }
+  }, [isSuccess, data, setUser]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      authCheckAttempted.current = true;
+    }
+  }, [isLoading]);
+
+  if (isLoading || !authCheckAttempted.current) {
+    return ( kolko_ladowania...)
+  }
+  return <>{children}</>;
+}
+
+```
+
+1. pobranie danych z api => zmiana stanu isLoading=False => Rerender CheckAuth
+2. Ocenka warunku renderowania `if (isLoading || !authCheckAttempted.current) // authCheckAttempted dalej defaultowo false` => wychodzi true => dalej renderuje kolko ladowania
+3. WYWOLANIE USEEFECTÓW - /**ustawienie stanu globalnego** + zmiana flagi authCheckAttempted na True/
+4. Zmiana globalnego setUser(), z ktorego korzysta ChechAuth (useLoggedUserState) => drugi rerender CheckAuth
+5. Ocenka warunku renderowania if (isLoading || !authCheckAttempted.current) => wychodzi false => renderowane są dzieci (RequireRole)
+6. Globalny stan user jest już aktualny => RequireRole działa poprawnie
+
+`const user = useLoggedUserState((state) => state.user);`
+Zmian subskrybowanego stanu powoduje rerender komponentu!!!
+
+useEffect wykonuje sie po zakonczonej fazie renderowania!!!
+
+## useRef() - Persistent mutable value / Referencja do DOM
+
+`const didRun = useRef(false);`
+
+- wartosc jest stała - nieresetuje sie miedzy renderami
+- zmiana wartosci nie powoduje reRenderu
+- ten sam obiekt przez całe życie komponentu
+- stosowany jako flaga logiczna
+
+## Gdzie umiescic CheckAuth
+
+```ts
+<CheckAuth>
+  <RouterProvider router={router} />
+</CheckAuth>
+```
+
+1. Owija cała aplikacje
+2. **CAŁA** aplikacja jest niewidoczna, dopóki autoryzacja nie zostanie w pełni sprawdzona
+3. CheckAuth montuje się i działa tylko raz przy starcie aplikacji.
+
+```tsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <CheckAuth>
+        <Layout />
+      </CheckAuth>
+    ),
+    children: [
+      /* ... */
+    ],
+  },
+  {
+    // trasy publiczen ktore renderuja sie bez czekania na CheckAuth
+    path: "/welcome",
+    element: <WelcomePage />,
+  },
+]);
+```
+
+1. Pozwala nam wybrac trasy ktore maja czekac na CheckAuth

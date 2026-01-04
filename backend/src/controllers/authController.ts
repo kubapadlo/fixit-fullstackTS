@@ -67,7 +67,7 @@ const login = async(req: Request,res: Response)=>{
 
     const user = await User.findOne({email: loginData.email})
     if(!user){
-      return res.status(404).json({message: "User not found, please login first"})
+      return res.status(404).json({message: "User not found, please register first"})
     }
 
     const isValid = await bcrypt.compare(loginData.password, user.passwordHash);
