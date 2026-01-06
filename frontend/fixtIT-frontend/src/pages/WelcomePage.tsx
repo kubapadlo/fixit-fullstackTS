@@ -1,8 +1,16 @@
 import { Grid, Box, Typography, Stack } from "@mui/material";
 import { motion } from "framer-motion";
 import { ActionCard, WELCOME_CARDS } from "../components/ActionCard";
+import { useLoggedUserState } from "../store/userStore";
 
 export function WelcomePage() {
+  const user = useLoggedUserState((state) => state.user);
+
+  const visibleCards =
+    user?.role === "student"
+      ? WELCOME_CARDS.slice(0, 2)
+      : WELCOME_CARDS.slice(2);
+
   return (
     <Grid
       container
@@ -10,7 +18,7 @@ export function WelcomePage() {
       sx={{
         py: 8,
         px: 3,
-        minHeight: "100vh",
+        minHeight: "80vh",
         alignItems: "center",
       }}
     >
@@ -45,7 +53,7 @@ export function WelcomePage() {
       {/* Prawa strona: Lista kart */}
       <Grid size={{ xs: 12, md: 5 }}>
         <Stack spacing={2.5}>
-          {WELCOME_CARDS.map((card, index) => (
+          {visibleCards.map((card, index) => (
             <ActionCard key={card.id} card={card} index={index} />
           ))}
         </Stack>

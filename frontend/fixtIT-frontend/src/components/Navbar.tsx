@@ -6,11 +6,11 @@ import {
   alpha,
   Typography,
 } from "@mui/material";
-import Logo from "./layout/Logo";
-import { ThemeToogle } from "./layout/ThemeToogle";
-import LoginToogle from "./layout/LoginToogle";
-import Greeter from "./layout/Greeter";
-import RegisterButton from "./layout/RegisterButton";
+import Logo from "./navbar/Logo";
+import { ThemeToogle } from "./navbar/ThemeToogle";
+import LoginToogle from "./navbar/LoginToogle";
+import Greeter from "./navbar/Greeter";
+import RegisterButton from "./navbar/RegisterButton";
 
 export default function Navbar() {
   const theme = useTheme();

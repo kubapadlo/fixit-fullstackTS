@@ -79,7 +79,7 @@ const login = async(req: Request,res: Response)=>{
     const accesToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: debugMode ? "1m" : "1m" } 
+      { expiresIn: debugMode ? "5m" : "5m" } 
     );
 
     const refreshToken = jwt.sign(

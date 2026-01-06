@@ -1,6 +1,6 @@
 import { Request, Response, urlencoded } from "express";
 import User from "../models/user.model";
-import { newFaultBody } from "../types/fault.types";
+import { newFaultBody, updateStateBody } from "../types/fault.types";
 import { Fault } from "../models/fault.model";
 import {createReadStream} from 'streamifier'
 import { cloudinary } from "../config/cloudinary";
@@ -98,6 +98,20 @@ const showFaults = async (req: Request, res:Response) => {
   }
 }
 
+const getAllFaults = async (req: Request, res: Response) => {
+  try {
+    const faults = await Fault.find()
+      .populate({
+        path: "reportedBy",
+        select: "firstName lastName location"
+      });
+
+    res.status(200).json(faults);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch faults" });
+  }
+};
+
 const editFault = async (req: Request, res:Response) => {
   try {
     const {faultID} = req.params;
@@ -139,27 +153,42 @@ const editFault = async (req: Request, res:Response) => {
 
 }
 
-const addReview = async (req: Request<{faultID:string},{},{review:string}>, res:Response) => {
+const addReview = async (req: Request<{faultID:string},{},updateStateBody>, res:Response) => {
   try {
-    const {review} = req.body
+    const {state, review} = req.body
     const {faultID} = req.params
+    const technicianId = req.user!.userId;
+    
     const faultToReview = await Fault.findById(faultID)
-
-    if(!faultToReview || faultToReview.reportedBy.toString() != req.user?.userId){
+    
+    if(!faultToReview){
       return res.status(404).json({message: "You dont have any faults with this id"})
     }
 
-    if(faultToReview.state != 'fixed'){
-      return res.status(400).json({message: "You can review only fixed faults"})
+    if (faultToReview.assignedTo && faultToReview.assignedTo.toString() !== technicianId) {
+      return res.status(403).json({ message: "Fault is assigned to another technician" });
     }
 
-    const updatedFault = await Fault.findOneAndUpdate(
-      {_id: faultID, reportedBy: req.user?.userId},
-      { $set: {review} },
-      { new : true}
-    )
+    if(faultToReview.state == 'reported' && state=="fixed" ){
+      return res.status(404).json({message: "Firstly mark fault as asigned"})
+    }
 
-    return res.status(200).json({updatedFault, message:"Successfuly added a review"})
+    if(faultToReview.state == 'fixed' && state != 'fixed'){
+      return res.status(404).json({message: "You cant undo fixed faults"})
+    }
+
+    if (state === "assigned") {
+      faultToReview.assignedTo = technicianId;
+    }
+
+    if (state === "fixed") {
+      faultToReview.review = review ?? faultToReview.review;
+    }
+
+    faultToReview.state = state;
+    await faultToReview.save();
+
+    return res.status(200).json({faultToReview, message:"Successfuly added a review"})
 
   } catch (error) {
       return res.status(500).json({message:"Error while adding a review"})
@@ -190,4 +219,4 @@ const deleteFault = async (req:Request,res:Response) => {
   } 
 }
 
-export { addFault, showFaults, editFault, addReview, deleteFault};
+export { addFault, showFaults, getAllFaults, editFault, addReview, deleteFault};

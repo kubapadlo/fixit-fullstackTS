@@ -1,10 +1,10 @@
 import { isAxiosError } from 'axios'
 import {api} from '../utils/api'
 
-import type { Fault } from '../types/fault.type';
+import type { FaultWithUserID } from '../types/fault.type';
 
 export interface FaultsResponse {
-  faults: Fault[];
+  faults: FaultWithUserID[];
 }
 
 export default async function getFaults(){

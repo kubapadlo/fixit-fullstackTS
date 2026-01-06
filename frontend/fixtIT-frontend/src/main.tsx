@@ -24,8 +24,8 @@ import { FaultsPage } from "./pages/FaultsPage.tsx";
 import ReportFaultPage from "./pages/ReportFaultPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
-import DashboardPage from "./pages/DashboardPage.tsx";
 import RequireRole from "./components/guards/RequireRole.tsx";
+import TechnicianPanel from "./pages/TechnicianPanel.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -41,13 +41,18 @@ const router = createBrowserRouter([
       },
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
-      { path: "/showFaults", element: <FaultsPage /> },
-      { path: "/report", element: <ReportFaultPage /> },
 
-      // 🔐 TYLKO ROLE
+      // Sprawdzanie roli
       {
         element: <RequireRole allowedRoles={["technician"]} />,
-        children: [{ path: "/dashboard", element: <DashboardPage /> }],
+        children: [{ path: "/dashboard", element: <TechnicianPanel /> }],
+      },
+      {
+        element: <RequireRole allowedRoles={["student"]} />,
+        children: [
+          { path: "/report", element: <ReportFaultPage /> },
+          { path: "/showFaults", element: <FaultsPage /> },
+        ],
       },
       { path: "*", element: <NotFoundPage /> },
     ],

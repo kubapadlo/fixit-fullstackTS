@@ -24,8 +24,13 @@ const faultSchema : Schema<IFault> = new Schema({
   },
   state: {
     type: String,
-    enum: ['reported', 'fixed'],
+    enum: ['reported', 'assigned', 'fixed'],
     default: 'reported'
+  },
+  assignedTo: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    default: null
   },
   review: {
     type: String,
@@ -48,8 +53,9 @@ export const newFaultSchema = {
     reportedAt: Joi.date().default(()=> new Date()),
     category: Joi.string().valid('Elektryk', 'Hydraulik', 'Murarz', 'Malarz', 'Stolarz', 'Ślusarz').default(''),
     description: Joi.string().required(),
-    state: Joi.string().valid('reported', 'fixed').default('reported'),
+    state: Joi.string().valid('reported', 'fixed', 'assigned').default('reported'),
     review: Joi.string().allow('').optional(),
+    assignedTo: Joi.string().optional(),
     imageURL: Joi.string().uri().allow(''),
     imageID: Joi.string().allow('')
   }).and('imageURL', 'imageID') // albo oba pola są obecne albo żadne
@@ -63,6 +69,7 @@ export const editFaultSchema = {
 
 export const addReviewSchema = {
   body: Joi.object({
-    review: Joi.string()
+    review: Joi.string(),
+    state:  Joi.string().valid('reported', 'fixed', 'assigned')
   }).unknown(false)
 }

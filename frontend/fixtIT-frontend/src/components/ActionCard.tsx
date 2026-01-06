@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import ListAltIcon from "@mui/icons-material/ListAlt";
-import ContactSupportIcon from "@mui/icons-material/ContactSupport";
+import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import type { JSX } from "react";
 import { useLoggedUserState } from "../store/userStore";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +32,12 @@ export const WELCOME_CARDS: CardConfig[] = [
     color: "#1976d2",
   },
   { id: 2, title: "Moje Usterki", icon: <ListAltIcon />, color: "#2e7d32" },
-  //  { id: 3, title: "Kontakt", icon: <ContactSupportIcon />, color: "#ed6c02" },
+  {
+    id: 3,
+    title: "Zarządzaj Usterkami",
+    icon: <SettingsSuggestIcon />,
+    color: "#ed6c02",
+  },
 ];
 
 interface CardProps {
@@ -42,7 +47,7 @@ interface CardProps {
 
 export const ActionCard = ({ card, index }: CardProps) => {
   const isAuthenticated = useLoggedUserState((state) => state.isAuthenticated);
-  const isLocked = !isAuthenticated && (card.id === 1 || card.id === 2);
+  const isLocked = !isAuthenticated;
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -52,6 +57,9 @@ export const ActionCard = ({ card, index }: CardProps) => {
         break;
       case 2:
         navigate("/showFaults"); // Zgłoś usterkę
+        break;
+      case 3:
+        navigate("/dashboard"); // Zgłoś usterkę
         break;
       default:
         console.warn("Nieznana karta:", card.id);

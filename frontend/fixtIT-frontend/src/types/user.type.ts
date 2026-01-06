@@ -4,3 +4,13 @@ export type User = {
     fullName: string,
     role:string
 }
+
+export interface ReportedBy {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  location: {
+    dorm: string;
+    room: string;
+  };
+}

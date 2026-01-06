@@ -68,27 +68,37 @@ const FaultCard = (props: FaultCardProps) => {
               </Typography>
               <Typography
                 variant="body2"
-                component="span" // Ważne, aby Typography nie tworzyła bloku
+                component="span"
                 sx={{
                   ml: 0.5,
-                  p: "2px 8px", // padding
-                  borderRadius: "4px", // zaokrąglenie
+                  p: "2px 8px",
+                  borderRadius: "4px",
                   fontWeight: "bold",
                   backgroundColor:
                     props.state === "fixed"
-                      ? "success.light"
-                      : props.state === "pending"
-                      ? "warning.light"
-                      : "error.light",
+                      ? "success.light" // Zielony
+                      : props.state === "assigned"
+                      ? "info.light" // Niebieski (DODANE)
+                      : props.state === "reported" || props.state === "pending"
+                      ? "warning.light" // Pomarańczowy
+                      : "error.light", // Czerwony (domyślny)
                   color:
                     props.state === "fixed"
-                      ? "success.contrastText"
-                      : props.state === "pending"
-                      ? "warning.contrastText"
+                      ? "success.contrastText" // lub "success.dark" dla lepszej czytelności
+                      : props.state === "assigned"
+                      ? "info.contrastText" // lub "info.dark" (DODANE)
+                      : props.state === "reported" || props.state === "pending"
+                      ? "warning.contrastText" // lub "warning.dark"
                       : "error.contrastText",
                 }}
               >
-                {props.state}
+                {props.state === "assigned"
+                  ? "W trakcie"
+                  : props.state === "fixed"
+                  ? "Naprawione"
+                  : props.state === "reported"
+                  ? "Zgłoszone"
+                  : props.state}
               </Typography>
             </Box>
           )}
