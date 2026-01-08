@@ -105,7 +105,7 @@ export function LoginPage() {
           disabled={mutation.isPending}
           sx={{ py: 1.3, borderRadius: 2 }}
         >
-          Click me
+          Zaloguj się
         </Button>
 
         {mutation.isError && (

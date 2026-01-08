@@ -13,8 +13,13 @@ import { verifyRole } from "./middleware/verifyRole.js";
 
 const app = express();
 
+const expo_client_url = process.env.EXPO_CLIENT_URL as string;
+
 app.use(cors({
-  origin: "http://localhost:5173",    // React frontend
+      origin: [
+      "http://localhost:5173",      // front Vite
+      expo_client_url  // Expo dev na telefonie
+    ],   
   credentials: true                   // jeśli używasz cookie lub sesji
 }));
 
