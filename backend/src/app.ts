@@ -18,6 +18,7 @@ const expo_client_url = process.env.EXPO_CLIENT_URL as string;
 app.use(cors({
       origin: [
       "http://localhost:5173",      // front Vite
+      "http://localhost:8081",  
       expo_client_url  // Expo dev na telefonie
     ],   
   credentials: true                   // jeśli używasz cookie lub sesji

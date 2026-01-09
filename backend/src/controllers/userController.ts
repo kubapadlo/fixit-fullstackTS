@@ -196,27 +196,42 @@ const addReview = async (req: Request<{faultID:string},{},updateStateBody>, res:
 
 }
 
-const deleteFault = async (req:Request,res:Response) => {
+const deleteFault = async (req: Request, res: Response) => {
   try {
-    const {faultID} = req.params;
+    const { faultID } = req.params;
+    const userId = req.user?.userId;
 
-    const deletedFault = await Fault.findOneAndDelete({
-      _id: faultID, reportedBy: req.user?.userId
-    });
-
-    if(deletedFault?.imageID){
-      await cloudinary.uploader.destroy(deletedFault.imageID);
+    if (!userId) {
+      return res.status(401).json({ message: "Not authenticated" });
     }
 
-    if (!deletedFault) {
+    const fault = await Fault.findOne({ _id: faultID, reportedBy: userId });
+
+    if (!fault) {
       return res.status(404).json({ message: "Fault not found or not authorized to delete" });
     }
 
-    return res.status(200).json({deletedFault, message: `Fault wtih ID ${faultID} deleted successfuly`})
+    if (fault.state === "assigned" || fault.state === "fixed") {
+      return res.status(403).json({
+        message: `You can't delete ${fault.state} fault`
+      });
+    }
+
+    await Fault.deleteOne({ _id: faultID });
+
+    if (fault.imageID) {
+      await cloudinary.uploader.destroy(fault.imageID);
+    }
+
+    return res.status(200).json({
+      message: `Fault with ID ${faultID} deleted successfully`,
+      deletedFault: fault
+    });
 
   } catch (error) {
-    return res.status(500).json({message: "Error while deleting a fault"})
-  } 
-}
+    console.error(error);
+    return res.status(500).json({ message: "Error while deleting a fault" });
+  }
+};
 
 export { addFault, showFaults, getAllFaults, editFault, addReview, deleteFault};

@@ -10,12 +10,13 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { z } from "zod";
+import { set, z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 
 import { login } from "../services/login";
+import { useLoggedUserState } from "../store/userStore";
 
 const loginFormSchema = z.object({
   email: z.email(),
@@ -33,10 +34,13 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
     resolver: zodResolver(loginFormSchema),
   });
 
+  const setUser = useLoggedUserState((state) => state.setUser);
+
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (data) => {
       Alert.alert("Git");
+      setUser(data.user, data.accessToken);
     },
     onError: (error) => {
       Alert.alert("Błąd logowania", error.message);
@@ -52,6 +56,19 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
+      <Text
+        style={{
+          fontSize: 50,
+          fontWeight: 900,
+          margin: 2,
+          textAlign: "center",
+          justifyContent: "center",
+          color: "lightblue",
+        }}
+      >
+        {" "}
+        FixIT
+      </Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.headerText}>Logowanie</Text>
 
@@ -65,6 +82,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
               style={styles.input}
               onChangeText={onChange}
               value={value}
+              autoCapitalize="none"
             />
           )}
         />
@@ -107,7 +125,6 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
   );
 }
 
-// POPRAWKA 2: Style są konieczne, aby widzieć inputy
 const styles = StyleSheet.create({
   container: {
     flex: 1,
