@@ -79,13 +79,13 @@ const login = async(req: Request,res: Response)=>{
     const accesToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: debugMode ? "5m" : "5m" } 
+      { expiresIn: debugMode ? "1m" : "1m" } 
     );
 
     const refreshToken = jwt.sign(
       { userId: user._id, role:user.role }, 
       process.env.SECRET_REFRESH_KEY as string, 
-      { expiresIn: "30m" } 
+      { expiresIn: "15m" } 
     );
 
     res.cookie("jwt", refreshToken, {

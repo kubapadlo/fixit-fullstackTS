@@ -3,8 +3,8 @@ import getFaults from "../services/getFaults";
 import { useLoggedUserState } from "../store/userStore";
 import FaultCard from "../components/FaultCard";
 import { Box, Typography } from "@mui/material";
-import { api } from "../utils/api";
 import { enqueueSnackbar } from "notistack";
+import deleteFault from "../services/deleteFault";
 
 export const FaultsPage = () => {
   const token = useLoggedUserState((state) => state.accessToken);
@@ -17,12 +17,15 @@ export const FaultsPage = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (faultID: string) => {
-      await api.delete(`/api/user/${faultID}/delete`);
-    },
+    mutationFn: deleteFault,
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["faults"] });
       enqueueSnackbar("Udalo sie usunac usterke", { variant: "success" });
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.message || "Nie można usunąć", {
+        variant: "error",
+      });
     },
   });
 

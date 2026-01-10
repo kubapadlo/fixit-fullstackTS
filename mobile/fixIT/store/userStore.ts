@@ -11,7 +11,7 @@ type UserStore = {
     logout: () => void
 }
 
-/*
+
 export const useLoggedUserState = create<UserStore>()(
   persist(
     (set) => ({
@@ -29,8 +29,9 @@ export const useLoggedUserState = create<UserStore>()(
     }
   )
 );
-*/
 
+
+/*
 export const useLoggedUserState = create<UserStore>()(
     (set) => ({
       isAuthenticated: false,
@@ -41,6 +42,7 @@ export const useLoggedUserState = create<UserStore>()(
     }),
   
 );
+*/
 
 // asyncStorage (asynchroniczy) = odpowiednik localStorage(synchroniczny)
 // nieszyfrowna baza klucz wartosc na DYSKU smartfona - przechowujemy tylko male ilosci niewrażliwych danych

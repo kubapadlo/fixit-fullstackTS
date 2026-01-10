@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import LoginScreen from "./screens/LoginScreen";
 import { FaultsScreen } from "./screens/FaultsScreen";
+import ReportFaultScreen from "./screens/ReportFaultScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer, useLocale } from "@react-navigation/native";
@@ -15,7 +16,7 @@ function MyTabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Show" component={FaultsScreen} />
-      <Tab.Screen name="Report" component={LoginScreen} />
+      <Tab.Screen name="Report" component={ReportFaultScreen} />
     </Tab.Navigator>
   );
 }

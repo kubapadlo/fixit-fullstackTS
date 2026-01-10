@@ -13,8 +13,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import getFaults from "../services/getFaults";
 import FaultCard from "../components/FaultCard";
 import deleteFault from "../services/deleteFault";
+import { useLoggedUserState } from "../store/userStore";
 
 export const FaultsScreen = () => {
+  const logout = useLoggedUserState((state) => state.logout);
+
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error, refetch, isRefetching } = useQuery({
@@ -89,18 +92,6 @@ export const FaultsScreen = () => {
           </View>
         }
       />
-
-      <TouchableOpacity
-        style={[styles.floatingButton, isRefetching && styles.disabledButton]}
-        onPress={() => refetch()}
-        disabled={isRefetching}
-      >
-        {isRefetching ? (
-          <ActivityIndicator color="white" size="small" />
-        ) : (
-          <Text style={styles.buttonText}>Odśwież listę</Text>
-        )}
-      </TouchableOpacity>
     </View>
   );
 };
