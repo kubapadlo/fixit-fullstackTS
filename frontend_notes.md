@@ -398,3 +398,32 @@ const router = createBrowserRouter([
 ```
 
 1. Pozwala nam wybrac trasy ktore maja czekac na CheckAuth
+
+## watch w RHF
+
+1. Formularz manualny z useState()
+
+```ts
+const [email, setEmail] = useState("");
+<input value={email} onChange={(e) => setEmail(e.target.value)} />;
+```
+
+Kazda literka = re-render całego komponentu - **MAŁO WYDAJNE**
+
+2. RHF przechowuje wartośći w **refach**, a nie w stanie ( ref = brak rerenderu)
+
+3. watch('nazwa_pola') = mówi do RHF: "Dla tego pola rób wyjątek. Za każdym razem gdy się zmieni, wymuś re-render.
+
+### watch() używamy gdy musimy coś wyświetlać na żywo (przed wysłaniem formsa)
+
+## Default values w formsach
+
+```ts
+const ReportFaultScreen = () => {
+  const form = useForm({
+    defaultValues: { description: "", category: "" },
+  });
+```
+
+1. Pozwalaja uniknac bledow z undefined
+2. Fajnie wspolpracuja z `reset()`, który po wywolaniu przywraca pola do default values(Przydatne po udanej wysyłce formsa)

@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Modal,
   FlatList,
+  Pressable,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +44,7 @@ const ReportFaultScreen = () => {
     setValue,
     reset,
     watch,
+    getValues,
     formState: { errors },
   } = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -72,8 +74,8 @@ const ReportFaultScreen = () => {
     }
   };
 
-  const selectedCategory = watch("category");
-  const [modalVisible, setModalVisible] = useState(false); 
+  //const selectedCategory = watch("category");
+  const [modalVisible, setModalVisible] = useState(false);
 
   const onSubmit = (data: FormFields) => {
     mutation.mutate(data);
@@ -118,9 +120,7 @@ const ReportFaultScreen = () => {
           ]}
           onPress={() => setModalVisible(true)}
         >
-          <Text style={{ color: selectedCategory ? "#000" : "#999" }}>
-            {selectedCategory || "Wybierz kategorię..."}
-          </Text>
+          <Text>{getValues("category") || "Wybierz kategorię..."}</Text>
         </TouchableOpacity>
         {errors.category && (
           <Text style={styles.errorText}>{errors.category.message}</Text>
@@ -133,12 +133,14 @@ const ReportFaultScreen = () => {
           animationType="fade"
           onRequestClose={() => setModalVisible(false)}
         >
-          <TouchableOpacity
+          <Pressable
             style={styles.modalOverlay}
-            activeOpacity={1}
             onPress={() => setModalVisible(false)}
           >
-            <View style={styles.modalContent}>
+            <View
+              style={styles.modalContent}
+              onStartShouldSetResponder={() => true}
+            >
               <Text style={styles.modalTitle}>Wybierz kategorię</Text>
               <FlatList
                 data={categories}
@@ -156,7 +158,7 @@ const ReportFaultScreen = () => {
                 )}
               />
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </Modal>
 
         {/* Zdjęcie */}
@@ -182,7 +184,7 @@ const ReportFaultScreen = () => {
         />
 
         {/* Przycisk wysyłania */}
-        <TouchableOpacity
+        <Pressable
           style={[
             styles.submitButton,
             mutation.isPending && styles.buttonDisabled,
@@ -195,7 +197,7 @@ const ReportFaultScreen = () => {
           ) : (
             <Text style={styles.submitButtonText}>Zgłoś</Text>
           )}
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );

@@ -118,7 +118,7 @@ const ReportFaultPage = () => {
 
             <FormControl fullWidth error={!!errors.category}>
               <InputLabel id="category-label">Kategoria</InputLabel>{" "}
-              <Controller
+              <Controller // sluzy do poloczenia wizualnego MUI z logiką RHF
                 name="category"
                 control={control}
                 render={({ field }) => (
@@ -126,7 +126,7 @@ const ReportFaultPage = () => {
                     labelId="category-label"
                     id="category"
                     label="Kategoria"
-                    {...field}
+                    {...field} // pod spodem przekazuje m.in. value i onChange dzieki ktoremu widzimy wybrana wartosc live
                   >
                     {categories.map((category) => (
                       <MenuItem key={category} value={category}>
