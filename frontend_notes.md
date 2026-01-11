@@ -427,3 +427,5 @@ const ReportFaultScreen = () => {
 
 1. Pozwalaja uniknac bledow z undefined
 2. Fajnie wspolpracuja z `reset()`, który po wywolaniu przywraca pola do default values(Przydatne po udanej wysyłce formsa)
+
+## Axios traktuje każdy status spoza zakresu 2xx jako błąd

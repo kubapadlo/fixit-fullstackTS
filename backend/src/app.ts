@@ -1,7 +1,8 @@
 import express from "express";
 import cookieParser from "cookie-parser"
 import cors from "cors"
-
+import helmet from "helmet";
+import rateLimit from 'express-rate-limit'
 //routery
 import authRouter from "./routers/authRoutes";
 import userRouter from "./routers/userRouter";
@@ -14,7 +15,6 @@ import { verifyRole } from "./middleware/verifyRole.js";
 const app = express();
 
 const expo_client_url = process.env.EXPO_CLIENT_URL as string;
-
 app.use(cors({
       origin: [
       "http://localhost:5173",      // front Vite
@@ -24,9 +24,16 @@ app.use(cors({
   credentials: true                   // jeśli używasz cookie lub sesji
 }));
 
-app.use(express.json());
-app.use(cookieParser())
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // Okno czasowe: 15 minut
+	limit: 2, // Maksymalnie 100 żądań z jednego IP w oknie czasowym
+	message: { message: 'Zbyt wiele zapytań z tego IP, spróbuj ponownie za 15 minut.' },
+});
+app.use(limiter)
 
+app.use(express.json());
+app.use(cookieParser());
+app.use(helmet());  
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
