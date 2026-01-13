@@ -232,7 +232,7 @@ const TechnicianPanel = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{alignItems: "flex-start"}}>
           {processedFaults.length === 0 ? (
             <Grid>
               <Box textAlign="center" py={10} sx={{ color: "text.secondary" }}>

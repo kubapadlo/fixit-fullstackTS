@@ -49,7 +49,9 @@ export const FaultsPage = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", p: 2 }}>
+    <Box
+      sx={{ display: "flex", flexWrap: "wrap", p: 2, alignItems: "flex-start" }}
+    >
       {data.map((fault) => (
         <FaultCard
           key={fault._id}

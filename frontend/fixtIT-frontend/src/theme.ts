@@ -1,6 +1,5 @@
-import { createTheme, alpha } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 
-// Używamy "as const", aby TypeScript wiedział, że to konkretne stałe wartości
 const sharedSettings = {
   shape: {
     borderRadius: 16,
@@ -11,11 +10,11 @@ const sharedSettings = {
     h2: { fontWeight: 700, letterSpacing: '-0.01em' },
     h6: { fontWeight: 600 },
     button: { 
-      textTransform: 'none' as const, // <--- TUTAJ DODANO "as const"
+      textTransform: 'none' as const, 
       fontWeight: 600 
     },
   },
-} as const; // Dodanie "as const" tutaj również pomaga zachować precyzyjne typy
+} as const;
 
 export const lightTheme = createTheme({
   ...sharedSettings,
@@ -56,7 +55,7 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#818cf8', // Jaśniejszy fiolet dla lepszej widoczności
+      main: '#818cf8',
       light: '#a5b4fc',
       dark: '#4f46e5',
       contrastText: '#ffffff',
@@ -65,12 +64,12 @@ export const darkTheme = createTheme({
       main: '#f472b6',
     },
     background: {
-      default: '#0f172a', // Bardzo ciemny granat
-      paper: '#1e293b',   // Nieco jaśniejszy granat dla kart i dialogów
+      default: '#0f172a', 
+      paper: '#1e293b',  
     },
     text: {
-      primary: '#f8fafc',   // Prawie biały
-      secondary: '#94a3b8', // Stonowany szary
+      primary: '#f8fafc',  
+      secondary: '#94a3b8',
     },
     divider: 'rgba(255, 255, 255, 0.12)',
     action: {
@@ -91,7 +90,7 @@ export const darkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          border: `1px solid rgba(255, 255, 255, 0.05)`, // Subtelna ramka zamiast cienia
+          border: `1px solid rgba(255, 255, 255, 0.05)`, 
         },
       },
     },

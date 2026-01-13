@@ -1,12 +1,4 @@
-import {
-  Box,
-  Typography,
-  Stack,
-  ButtonBase,
-  Paper,
-  alpha,
-  Icon,
-} from "@mui/material";
+import { Box, Typography, Stack, ButtonBase } from "@mui/material";
 import { motion } from "framer-motion";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";

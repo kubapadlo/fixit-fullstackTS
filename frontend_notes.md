@@ -429,3 +429,11 @@ const ReportFaultScreen = () => {
 2. Fajnie wspolpracuja z `reset()`, który po wywolaniu przywraca pola do default values(Przydatne po udanej wysyłce formsa)
 
 ## Axios traktuje każdy status spoza zakresu 2xx jako błąd
+
+## flex start vs strech
+
+![alt text](note_ss/karta.png)
+
+Domyślnie (stretch): Flexbox mówi: "Wszystkie dzieci w tym rzędzie muszą mieć taką samą wysokość jak najwyższy brat".
+
+flex-start: Flexbox mówi: "Każde dziecko ma mieć taką wysokość, jakiej potrzebuje jego zawartość, i wszystkie mają wyrównać się do góry".
