@@ -76,22 +76,34 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            bgcolor: "background.paper",
+            color: "text.primary",
           }}
         >
           Zarządzanie usterką
-          <IconButton onClick={onClose} size="small">
+          <IconButton
+            onClick={onClose}
+            size="small"
+            sx={{ color: "text.secondary" }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ bgcolor: "background.paper" }}>
           <Box mb={3}>
-            <Typography variant="subtitle2" gutterBottom color="textSecondary">
+            <Typography variant="subtitle2" gutterBottom color="text.secondary">
               Opis zgłoszenia:
             </Typography>
             <Typography
               variant="body1"
               paragraph
-              sx={{ bgcolor: "#f9f9f9", p: 1, borderRadius: 1 }}
+              sx={{
+                bgcolor: "background.default",
+                p: 2,
+                borderRadius: 1,
+                color: "text.primary",
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+              }}
             >
               {fault.description}
             </Typography>
@@ -103,26 +115,38 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
               control={control}
               render={({ field }) => (
                 <FormControl fullWidth variant="outlined">
-                  <InputLabel>Status</InputLabel>
-                  <Select {...field} label="Status">
+                  <InputLabel sx={{ color: "text.secondary" }}>
+                    Status
+                  </InputLabel>
+                  <Select
+                    {...field}
+                    label="Status"
+                    sx={{ color: "text.primary" }}
+                  >
                     <MenuItem value="reported">
                       <Box display="flex" alignItems="center" gap={1}>
-                        <ReportIcon color="warning" fontSize="small" />{" "}
-                        Zgłoszone (Wolne)
+                        <ReportIcon color="warning" fontSize="small" />
+                        <Typography color="text.primary">
+                          Zgłoszone (Wolne)
+                        </Typography>
                       </Box>
                     </MenuItem>
 
                     <MenuItem value="assigned">
                       <Box display="flex" alignItems="center" gap={1}>
-                        <ConstructionIcon color="info" fontSize="small" /> W
-                        trakcie realizacji (Moje)
+                        <ConstructionIcon color="info" fontSize="small" />
+                        <Typography color="text.primary">
+                          W trakcie realizacji (Moje)
+                        </Typography>
                       </Box>
                     </MenuItem>
 
                     <MenuItem value="fixed">
                       <Box display="flex" alignItems="center" gap={1}>
-                        <CheckCircleIcon color="success" fontSize="small" />{" "}
-                        Zakończone (Naprawione)
+                        <CheckCircleIcon color="success" fontSize="small" />
+                        <Typography color="text.primary">
+                          Zakończone (Naprawione)
+                        </Typography>
                       </Box>
                     </MenuItem>
                   </Select>
@@ -137,7 +161,6 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
               control={control}
               rules={{
                 validate: (value) => {
-                  // Walidacja: review wymagane tylko gdy status to 'fixed'
                   if (
                     currentState === "fixed" &&
                     (!value || value.trim().length < 5)
@@ -168,13 +191,22 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
                       ? "Wymagane do zamknięcia zgłoszenia"
                       : "Opcjonalne"
                   }
+                  sx={{
+                    "& .MuiInputBase-input": { color: "text.primary" },
+                    "& .MuiInputLabel-root": { color: "text.secondary" },
+                  }}
                 />
               )}
             />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={onClose} color="inherit" disabled={isSaving}>
+        <DialogActions sx={{ p: 2, bgcolor: "background.paper" }}>
+          <Button
+            onClick={onClose}
+            color="inherit"
+            disabled={isSaving}
+            sx={{ color: "text.secondary" }}
+          >
             Anuluj
           </Button>
           <Button

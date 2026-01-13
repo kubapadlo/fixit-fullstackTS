@@ -29,11 +29,17 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
   const theme = useTheme();
 
   const isFixed = fault.state === "fixed";
+  const isAssigned = fault.state === "assigned";
 
-  // Bezpieczny dostęp do location (zakładając że backend może zwrócić populated lub nie)
   const locationText = fault.reportedBy?.location
-    ? `Akademik ${fault.reportedBy.location.dorm}, Pokój ${fault.reportedBy.location.room}`
+    ? `${fault.reportedBy.location.dorm}, Pokój ${fault.reportedBy.location.room}`
     : "Brak danych o lokalizacji";
+
+  const getStatusColor = () => {
+    if (isFixed) return theme.palette.success.main;
+    if (isAssigned) return theme.palette.info.main;
+    return theme.palette.error.main;
+  };
 
   return (
     <Card
@@ -43,14 +49,13 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
         display: "flex",
         flexDirection: "column",
         position: "relative",
+        bgcolor: "background.paper",
       }}
     >
       <Box
         sx={{
           height: 6,
-          bgcolor: isFixed
-            ? theme.palette.success.main
-            : theme.palette.error.main,
+          bgcolor: getStatusColor(),
         }}
       />
 
@@ -61,15 +66,25 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
           </Avatar>
         }
         title={
-          <Typography variant="subtitle1" fontWeight="bold">
+          <Typography
+            variant="subtitle1"
+            fontWeight="bold"
+            color="text.primary"
+          >
             {fault.category}
           </Typography>
         }
-        subheader={new Date(fault.reportedAt).toLocaleString()}
+        subheader={
+          <Typography variant="caption" color="text.secondary">
+            {new Date(fault.reportedAt).toLocaleString()}
+          </Typography>
+        }
         action={
           <Chip
-            label={isFixed ? "Naprawione" : "Oczekujące"}
-            color={isFixed ? "success" : "warning"}
+            label={
+              isFixed ? "Naprawione" : isAssigned ? "W trakcie" : "Oczekujące"
+            }
+            color={isFixed ? "success" : isAssigned ? "info" : "warning"}
             size="small"
             variant="outlined"
           />
@@ -91,15 +106,23 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
           display="flex"
           alignItems="center"
           mb={1}
-          sx={{ bgcolor: "#f0f4f8", p: 1, borderRadius: 1 }}
+          sx={{
+            bgcolor: "background.default",
+            p: 1,
+            borderRadius: 1,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
         >
           <LocationIcon fontSize="small" color="primary" sx={{ mr: 1 }} />
-          <Typography variant="body2" fontWeight="bold">
+          <Typography variant="body2" fontWeight="bold" color="text.primary">
             {locationText}
           </Typography>
         </Box>
 
-        <Typography variant="body1" sx={{ mt: 2, fontWeight: 500 }}>
+        <Typography
+          variant="body1"
+          sx={{ mt: 2, fontWeight: 500, color: "text.primary" }}
+        >
           {fault.description}
         </Typography>
 
@@ -119,7 +142,10 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
             >
               Opinia technika:
             </Typography>
-            <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+            <Typography
+              variant="body2"
+              sx={{ fontStyle: "italic", color: "text.primary" }}
+            >
               {fault.review}
             </Typography>
           </Box>
@@ -132,6 +158,12 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
           startIcon={<BuildIcon />}
           onClick={onManage}
           fullWidth
+          sx={{
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: theme.shadows[2],
+            },
+          }}
         >
           Zarządzaj
         </Button>

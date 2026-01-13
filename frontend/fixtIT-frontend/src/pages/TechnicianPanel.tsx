@@ -163,31 +163,39 @@ const TechnicianPanel = () => {
   ).length;
 
   return (
-    <Box sx={{ bgcolor: "#f5f7fa", minHeight: "100vh", py: 4 }}>
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        minHeight: "100vh",
+        py: 4,
+        transition: "0.3s",
+      }}
+    >
       <Container maxWidth="xl">
         <Typography
           variant="h4"
           component="h1"
           gutterBottom
-          sx={{ fontWeight: "bold", color: "#1a237e" }}
+          sx={{ fontWeight: "bold", color: "primary.main", mb: 4 }}
         >
           Panel Technika
         </Typography>
 
-        <Grid container spacing={2} alignItems="center" sx={{ mb: 4 }}>
+        <Grid container spacing={3} alignItems="stretch" sx={{ mb: 4 }}>
           <Grid>
-            <Card>
+            <Card sx={{ bgcolor: "background.paper" }}>
               <Tabs
                 value={tabValue}
                 onChange={handleTabChange}
-                variant="fullWidth"
+                variant="scrollable"
+                scrollButtons="auto"
                 indicatorColor="primary"
                 textColor="primary"
               >
                 <Tab
                   icon={<ReportIcon />}
                   iconPosition="start"
-                  label={`Wszystkie wolne (${reportedCount})`}
+                  label={`Wolne zgłoszenia (${reportedCount})`}
                 />
                 <Tab
                   icon={<ConstructionIcon />}
@@ -197,19 +205,20 @@ const TechnicianPanel = () => {
                 <Tab
                   icon={<CheckCircleIcon />}
                   iconPosition="start"
-                  label="Historia napraw"
+                  label="Moja historia"
                 />
               </Tabs>
             </Card>
           </Grid>
           <Grid>
-            <FormControl fullWidth variant="outlined" sx={{ bgcolor: "white" }}>
+            <FormControl fullWidth variant="outlined">
               <InputLabel id="sort-label">Sortuj według</InputLabel>
               <Select
                 labelId="sort-label"
                 value={sortBy}
                 label="Sortuj według"
                 onChange={handleSortChange}
+                sx={{ bgcolor: "background.paper" }}
                 startAdornment={
                   <SortIcon sx={{ mr: 1, color: "action.active" }} />
                 }
@@ -217,7 +226,7 @@ const TechnicianPanel = () => {
                 <MenuItem value="date_desc">Najnowsze zgłoszenia</MenuItem>
                 <MenuItem value="date_asc">Najstarsze zgłoszenia</MenuItem>
                 <MenuItem value="category">Kategoria (A-Z)</MenuItem>
-                <MenuItem value="location">Lokalizacja (Akademik)</MenuItem>
+                <MenuItem value="location">Lokalizacja</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -226,7 +235,7 @@ const TechnicianPanel = () => {
         <Grid container spacing={3}>
           {processedFaults.length === 0 ? (
             <Grid>
-              <Box textAlign="center" py={8} color="text.secondary">
+              <Box textAlign="center" py={10} sx={{ color: "text.secondary" }}>
                 <Typography variant="h6">
                   Brak zgłoszeń w tej sekcji.
                 </Typography>
@@ -234,7 +243,7 @@ const TechnicianPanel = () => {
             </Grid>
           ) : (
             processedFaults.map((fault) => (
-              <Grid>
+              <Grid key={fault._id}>
                 <FaultCard
                   fault={fault}
                   onManage={() => handleOpenManage(fault)}
@@ -244,7 +253,6 @@ const TechnicianPanel = () => {
           )}
         </Grid>
 
-        {/* Dialog edycji */}
         <EditFaultDialog
           open={openDialog}
           onClose={() => setOpenDialog(false)}

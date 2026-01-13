@@ -56,28 +56,34 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#818cf8',
+      main: '#818cf8', // Jaśniejszy fiolet dla lepszej widoczności
       light: '#a5b4fc',
-      dark: '#6366f1',
+      dark: '#4f46e5',
+      contrastText: '#ffffff',
     },
     secondary: {
       main: '#f472b6',
     },
     background: {
-      default: '#020617',
-      paper: '#0f172a',
+      default: '#0f172a', // Bardzo ciemny granat
+      paper: '#1e293b',   // Nieco jaśniejszy granat dla kart i dialogów
     },
     text: {
-      primary: '#f1f5f9',
-      secondary: '#94a3b8',
+      primary: '#f8fafc',   // Prawie biały
+      secondary: '#94a3b8', // Stonowany szary
     },
+    divider: 'rgba(255, 255, 255, 0.12)',
+    action: {
+      active: '#94a3b8',
+      hover: 'rgba(255, 255, 255, 0.08)',
+    }
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           padding: '10px 24px',
-          boxShadow: 'none',
+          borderRadius: 12,
         },
       },
     },
@@ -85,7 +91,16 @@ export const darkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          border: `1px solid ${alpha('#cbd5e1', 0.1)}`,
+          border: `1px solid rgba(255, 255, 255, 0.05)`, // Subtelna ramka zamiast cienia
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': {
+            color: '#818cf8',
+          },
         },
       },
     },
