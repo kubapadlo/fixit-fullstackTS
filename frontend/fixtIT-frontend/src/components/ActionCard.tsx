@@ -133,7 +133,12 @@ export const ActionCard = ({ card, index }: CardProps) => {
           </Typography>
 
           {isLocked && (
-            <Stack alignItems="center" direction={"row"} spacing={0.5}>
+            <Stack
+              alignItems="center"
+              color="black"
+              direction={"row"}
+              spacing={0.5}
+            >
               <LockOutlinedIcon sx={{ fontSize: 16 }} />
               <Typography variant="caption">Najpierw się zaloguj</Typography>
             </Stack>

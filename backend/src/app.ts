@@ -25,8 +25,8 @@ app.use(cors({
 }));
 
 const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // Okno czasowe: 15 minut
-	limit: 2, // Maksymalnie 100 żądań z jednego IP w oknie czasowym
+	windowMs: 15 * 60 * 1000, // 15 minut
+	limit: 200, 
 	message: { message: 'Zbyt wiele zapytań z tego IP, spróbuj ponownie za 15 minut.' },
 });
 app.use(limiter)

@@ -10,6 +10,7 @@ interface Fault<TUser> {
   imageURL: string;
   review: string;
   state: "reported" | "assigned" | "fixed";
+  assignedTo: string | null;
   __v: number;
 }
 

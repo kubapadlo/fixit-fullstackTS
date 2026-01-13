@@ -29,10 +29,12 @@ import type { EditFormData } from "../components/dashboard/EditFaultDialog";
 import EditFaultDialog from "../components/dashboard/EditFaultDialog";
 import type { FaultWithUserObject } from "../types/fault.type";
 import { enqueueSnackbar } from "notistack";
+import { useLoggedUserState } from "../store/userStore";
 
 type SortOption = "date_desc" | "date_asc" | "category" | "location";
 
 const TechnicianPanel = () => {
+  const loggedUser = useLoggedUserState((state) => state.user);
   const queryClient = useQueryClient();
   const [tabValue, setTabValue] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
@@ -96,9 +98,9 @@ const TechnicianPanel = () => {
         case 0:
           return f.state === "reported";
         case 1:
-          return f.state === "assigned";
+          return f.state === "assigned" && f.assignedTo === loggedUser?.id;
         case 2:
-          return f.state === "fixed";
+          return f.state === "fixed" && f.assignedTo === loggedUser?.id;
         default:
           return false;
       }
@@ -156,7 +158,9 @@ const TechnicianPanel = () => {
   }
 
   const reportedCount = faults.filter((f) => f.state === "reported").length;
-  const assignedCount = faults.filter((f) => f.state === "assigned").length;
+  const myAssignedCount = faults.filter(
+    (f) => f.state === "assigned" && f.assignedTo === loggedUser?.id
+  ).length;
 
   return (
     <Box sx={{ bgcolor: "#f5f7fa", minHeight: "100vh", py: 4 }}>
@@ -188,7 +192,7 @@ const TechnicianPanel = () => {
                 <Tab
                   icon={<ConstructionIcon />}
                   iconPosition="start"
-                  label={`Moje usterki (${assignedCount})`}
+                  label={`Moje usterki (${myAssignedCount})`}
                 />
                 <Tab
                   icon={<CheckCircleIcon />}
