@@ -12,9 +12,9 @@ import { LoginRequestBody, MyJwtPayload, RegisterRequestBody } from "../types/us
 // flagi
 const debugMode = process.env.DEBUG_MODE === "true";
 
-const register = async (req: Request, res: Response) => {
+const register = async (req: Request<{},{}, RegisterRequestBody>, res: Response) => {
   try {
-    const newUser = req.body as RegisterRequestBody;
+    const newUser = req.body;
     
     if (!newUser?.email || !newUser?.password || !newUser?.firstName || !newUser?.lastName) {
       return res.status(400).json({ message: "No user data in request body" });
@@ -27,10 +27,9 @@ const register = async (req: Request, res: Response) => {
         .json({ message: "User with this email already exists" });
     }
 
-    // 2. Sprawdzenie, ile osób ma już zarejestrowaną tę lokalizację
     const usersInLocationCount = await User.countDocuments({ location: newUser.location });
 
-    if (usersInLocationCount >= 2) { // Jeśli już 2 lub więcej użytkowników ma tę lokalizację
+    if (usersInLocationCount >= 2) { 
       return res
         .status(400)
         .json({ message: `Pokój ${newUser.location.dorm} ${newUser.location.room} został już przypisany do maksymalnej liczby osób(2). Skontaktuj się z administratorem.` });

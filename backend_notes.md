@@ -253,3 +253,13 @@ return res.status(200).json({
 ```
 
 ### UWAGA! - Przy zwracaniu usera nie zwracamy wrażliwych danych, tylko przefiltrowane bez haseł itd!!!
+
+# operatory ts
+
+```ts
+const technicianId = req.user!.userId; // zapewniamy ts że to pole nie jest null
+```
+
+```ts
+Request<Params, ResBody, ReqBody, Query>; // typowanie requesta na endpoincie
+```

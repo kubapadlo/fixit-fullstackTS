@@ -61,7 +61,7 @@ const addFault = async(req:Request<{},{}, newFaultBody>, res:Response) => {
         return res.status(500).json("Error while uploading a file " + error)
       }
     }
-
+    
     console.log(req.body)
 
     const newFault = await Fault.create({
@@ -152,12 +152,12 @@ const editFault = async (req: Request, res:Response) => {
   }
 
 }
-
-const addReview = async (req: Request<{faultID:string},{},updateStateBody>, res:Response) => {
+// Request<Params, ResBody, ReqBody, Query>
+const addReview = async (req: Request<{faultID:string},{},updateStateBody, {}>, res:Response) => {
   try {
     const {state, review} = req.body
     const {faultID} = req.params
-    const technicianId = req.user!.userId;
+    const technicianId = req.user!.userId;  // zapewniamy ts że to pole nie jest null
     
     const faultToReview = await Fault.findById(faultID)
     
@@ -196,7 +196,7 @@ const addReview = async (req: Request<{faultID:string},{},updateStateBody>, res:
 
 }
 
-const deleteFault = async (req: Request, res: Response) => {
+const deleteFault = async (req: Request<{faultID:string}>, res: Response) => {
   try {
     const { faultID } = req.params;
     const userId = req.user?.userId;
