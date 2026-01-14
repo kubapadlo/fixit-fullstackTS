@@ -263,3 +263,5 @@ const technicianId = req.user!.userId; // zapewniamy ts że to pole nie jest nul
 ```ts
 Request<Params, ResBody, ReqBody, Query>; // typowanie requesta na endpoincie
 ```
+
+## w sql domyslne pole id to "id", a w mongo "\_id"

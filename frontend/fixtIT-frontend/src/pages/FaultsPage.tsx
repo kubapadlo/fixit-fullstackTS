@@ -1,19 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import getFaults from "../services/getFaults";
-import { useLoggedUserState } from "../store/userStore";
 import FaultCard from "../components/FaultCard";
 import { Box, Typography } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import deleteFault from "../services/deleteFault";
 
 export const FaultsPage = () => {
-  const token = useLoggedUserState((state) => state.accessToken);
-
   const queryclient = useQueryClient();
   const { data, isLoading, isError } = useQuery({
     queryFn: getFaults,
     queryKey: ["faults"],
-    enabled: !!token,
   });
 
   const deleteMutation = useMutation({
@@ -54,7 +50,7 @@ export const FaultsPage = () => {
     >
       {data.map((fault) => (
         <FaultCard
-          key={fault._id}
+          key={fault.id}
           category={fault.category}
           description={fault.description}
           reportedAt={fault.reportedAt}
@@ -63,7 +59,7 @@ export const FaultsPage = () => {
           onDelete={(id) => {
             handleDelete(id);
           }}
-          id={fault._id}
+          id={fault.id}
         />
       ))}
       {deleteMutation.isPending && (

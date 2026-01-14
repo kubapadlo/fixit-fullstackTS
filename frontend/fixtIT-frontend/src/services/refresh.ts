@@ -3,7 +3,6 @@ import type { User } from "../types/user.type"
 import { isAxiosError } from "axios"
 
 interface refreshResult {
-    accessToken: string,
     user: User
 }
 

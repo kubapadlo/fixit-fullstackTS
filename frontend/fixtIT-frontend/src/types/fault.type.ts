@@ -1,7 +1,7 @@
 import type { ReportedBy } from "./user.type";
 
 interface Fault<TUser> {
-  _id: string;
+  id: string;
   reportedAt: string;  
   reportedBy: TUser;
   category: 'Elektryk' | 'Hydraulik' | 'Murarz' | 'Malarz' | 'Stolarz' | 'Ślusarz';

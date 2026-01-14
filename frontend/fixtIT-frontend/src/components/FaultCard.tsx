@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Card,
   CardContent,
@@ -11,14 +10,14 @@ import {
 } from "@mui/material";
 
 interface FaultCardProps {
-  id: string; // Zakładamy, że karta zawsze ma ID
+  id: string;
   reportedAt?: string;
   category: string;
   description: string;
   state?: string;
   imageURL?: string;
-  onDelete?: (id: string) => void; // Zmieniamy typ, aby przekazywać ID
-  onCardClick?: (id: string) => void; // Nowy prop: co ma się stać po kliknięciu karty
+  onDelete?: (id: string) => void;
+  onCardClick?: (id: string) => void;
 }
 
 const FaultCard = (props: FaultCardProps) => {

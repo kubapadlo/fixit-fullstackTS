@@ -234,7 +234,7 @@ const deleteFault = async (req: Request<{faultID:string}>, res: Response) => {
     });
 
     if (!fault) {
-      return res.status(404).json({ message: "Fault not found or not authorized to delete" });
+      return res.status(404).json({ message: "Fault not found" });
     }
 
     if (fault.state === "assigned" || fault.state === "fixed") {

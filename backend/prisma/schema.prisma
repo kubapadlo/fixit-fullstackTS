@@ -21,7 +21,6 @@ model User {
   firstName    String
   lastName     String
   
-  // W relacyjnych bazach płaskie pola są lepszą praktyką niż zagnieżdżone obiekty
   dorm         String?
   room         String?
 
@@ -61,7 +60,7 @@ model Fault {
   reportedBy   User       @relation("ReportedFaults", fields: [reportedById], references: [id])
   reportedById String
 
-  // Relacja do technika (opcjonalna)
+  // Relacja do technika
   assignedTo   User?      @relation("AssignedFaults", fields: [assignedToId], references: [id])
   assignedToId String?
 }

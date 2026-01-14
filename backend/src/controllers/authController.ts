@@ -74,24 +74,29 @@ const login = async (req: Request, res: Response) => {
     const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.SECRET_ACCESS_KEY as string,
-      { expiresIn: "15m" }
+      { expiresIn: "1m" }
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.SECRET_REFRESH_KEY as string,
-      { expiresIn: "7d" }
+      { expiresIn: "1h" }
     );
 
-    res.cookie("jwt", refreshToken, {
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+      maxAge: 1 * 60 * 1000,  // minuta
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 1000,
     });
 
     return res.status(200).json({
       user: { id: user.id, role: user.role, fullName: `${user.firstName} ${user.lastName}` },
-      accessToken,
       message: "Logged successfully"
     });
   } catch (error) {
@@ -101,7 +106,7 @@ const login = async (req: Request, res: Response) => {
 
 const refreshToken = async (req: Request, res: Response) => {
   try {
-    const rtoken = req.cookies?.jwt;
+    const rtoken = req.cookies?.refreshToken;
     if (!rtoken) return res.status(401).json({ message: "No refresh token" });
 
     jwt.verify(rtoken, process.env.SECRET_REFRESH_KEY as string, async (err: any, decoded: any) => {
@@ -115,11 +120,16 @@ const refreshToken = async (req: Request, res: Response) => {
       const newAccessToken = jwt.sign(
         { userId: user.id, role: user.role },
         process.env.SECRET_ACCESS_KEY as string,
-        { expiresIn: "15m" }
+        { expiresIn: "1m" }
       );
 
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 1 * 60 * 1000,  // minuta
+    });
+
       return res.status(200).json({
-        accessToken: newAccessToken,
         user: { id: user.id, role: user.role, fullName: `${user.firstName} ${user.lastName}` }
       });
     });

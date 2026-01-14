@@ -45,7 +45,7 @@ export function LoginPage() {
       enqueueSnackbar(`Udało się zalogować jako ${data.user.role}`, {
         variant: "success",
       });
-      setUser(data.user, data.accessToken);
+      setUser(data.user);
       if (data.user.role === "technician") navigate("/dashboard");
       else navigate("/");
     },

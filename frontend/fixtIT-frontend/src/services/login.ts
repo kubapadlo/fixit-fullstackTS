@@ -8,8 +8,8 @@ interface logindata {
 }
 
 interface loginresult{
-    accessToken: string,
-    user: User
+    user: User,
+    message: string
 }
 
 export async function login({email, password}:logindata) {

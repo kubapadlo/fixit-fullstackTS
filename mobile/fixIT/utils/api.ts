@@ -50,7 +50,6 @@ api.interceptors.response.use(
         return api(originalRequest);
         
       } catch (refreshError) {
-        console.error("Refresh token expired");
         useLoggedUserState.getState().logout();
         return Promise.reject(refreshError);
       }
