@@ -3,14 +3,11 @@ import { Router } from "express";
 import { addFault, addReview, deleteFault, editFault, getAllFaults, showFaults, upload } from "../controllers/userController";
 
 import { addReviewSchema, editFaultSchema, newFaultSchema } from "../models/fault.model";
-// @ts-ignore
-import {validate} from "../middleware/validate.js"
-// @ts-ignore
-import {verifyRole} from "../middleware/verifyRole.js"
-// @ts-ignore
-import {verifyJWT} from "../middleware/verifyJWT.js"
-// @ts-ignore
-import {multerErrorHandler} from "../middleware/multerErrorHandler.js"
+
+import {validate} from "../middleware/validate"
+import {verifyRole} from "../middleware/verifyRole"
+import {verifyJWT} from "../middleware/verifyJWT"
+import {multerErrorHandler} from "../middleware/multerErrorHandler"
 
 const userRouter = Router();
 

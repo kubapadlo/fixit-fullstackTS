@@ -2,13 +2,13 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
-    "rootDir": "./src", // <--- Important: This tells TypeScript where your source files are
-    "outDir": "./dist", // <--- Where compiled JS will go (can be anything, but 'dist' is common)
+    "rootDir": "./src", 
+    "outDir": "./dist", 
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "src/middleware/verifyJWT.js", "src/middleware/verifyRole.js"], // <--- Include all .ts files in src
+  "include": ["src/**/*.ts"], 
   "exclude": ["node_modules"]
 }

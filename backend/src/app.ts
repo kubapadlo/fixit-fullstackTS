@@ -3,14 +3,10 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import helmet from "helmet";
 import rateLimit from 'express-rate-limit'
+
 //routery
 import authRouter from "./routers/authRoutes";
 import userRouter from "./routers/userRouter";
-
-// @ts-ignore
-import { verifyJWT } from "./middleware/verifyJWT.js";
-// @ts-ignore
-import { verifyRole } from "./middleware/verifyRole.js";
 
 const app = express();
 
@@ -37,9 +33,5 @@ app.use(helmet());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
-
-app.get('/testPage', verifyJWT, verifyRole("admin", "user"), (req,res)=>{
-    res.json({message: "Hello World"})
-})
 
 export default app;
