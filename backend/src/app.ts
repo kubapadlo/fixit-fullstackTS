@@ -7,11 +7,6 @@ import rateLimit from 'express-rate-limit'
 import authRouter from "./routers/authRoutes";
 import userRouter from "./routers/userRouter";
 
-// @ts-ignore
-import { verifyJWT } from "./middleware/verifyJWT.js";
-// @ts-ignore
-import { verifyRole } from "./middleware/verifyRole.js";
-
 const app = express();
 
 const expo_client_url = process.env.EXPO_CLIENT_URL as string;
@@ -37,9 +32,5 @@ app.use(helmet());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
-
-app.get('/testPage', verifyJWT, verifyRole("admin", "user"), (req,res)=>{
-    res.json({message: "Hello World"})
-})
 
 export default app;

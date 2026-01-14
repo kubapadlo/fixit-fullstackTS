@@ -4,8 +4,6 @@ import jwt from "jsonwebtoken";
 import {prisma} from "../../lib/prisma" 
 import { LoginRequestBody, MyJwtPayload, RegisterRequestBody } from "../types/user.types";
 
-const debugMode = process.env.DEBUG_MODE === "true";
-
 const register = async (req: Request<{}, {}, RegisterRequestBody>, res: Response) => {
   try {
     const newUser = req.body;
@@ -21,10 +19,8 @@ const register = async (req: Request<{}, {}, RegisterRequestBody>, res: Response
     if (alreadyExists) {
       return res.status(400).json({ message: "User with this email already exists" });
     }
-
-
     
-      const usersInLocationCount = await prisma.user.count({
+    const usersInLocationCount = await prisma.user.count({
         where: {
           dorm: newUser.location.dorm,
           room: newUser.location.room

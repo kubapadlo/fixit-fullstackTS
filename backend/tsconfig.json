@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
-    "rootDir": "./",          // Zmiana z "./src" na "./"
+    "rootDir": "./",      
     "outDir": "./dist",
     "esModuleInterop": true,
     "strict": true,
@@ -10,8 +10,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src/**/*.ts", 
-    "src/**/*.js",          
+    "src/**/*.ts",          
     "lib/**/*.ts",          
     "prisma.config.ts"       
   ],

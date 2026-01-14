@@ -1,8 +1,8 @@
 import { Router } from "express";
 import  {register,login, refreshToken, logout}  from "../controllers/authController";
 
-// @ts-ignore
-import {validate} from "../middleware/validate.js"
+// middleware
+import {validate} from "../middleware/validate"
 
 import { userLoginValidationSchema, userRegisterValidationSchema } from "../validators/user.model";
 
