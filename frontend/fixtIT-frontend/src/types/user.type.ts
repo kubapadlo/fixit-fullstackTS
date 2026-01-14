@@ -9,8 +9,6 @@ export interface ReportedBy {
   _id: string;
   firstName: string;
   lastName: string;
-  location: {
-    dorm: string;
-    room: string;
-  };
+  dorm: string;
+  room: string;
 }

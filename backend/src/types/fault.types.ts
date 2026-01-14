@@ -1,5 +1,6 @@
 import { Document } from 'mongoose'
 import { IUser } from './user.types';
+import { Category, FaultState } from "@prisma/client"; 
 
 export interface IFault extends Document {
   reportedBy: String;
@@ -13,10 +14,10 @@ export interface IFault extends Document {
   imageID: string  // konieczne do usuwania zdjec z cloudinary
 }
 
-export interface newFaultBody{
-  category: string
+export interface newFaultBody {
+  category: Category;      // Zamiast string
   description: string;
-  state?: string;
+  state?: FaultState;      // Zamiast string?
 }
 
 export interface updateStateBody{

@@ -31,9 +31,10 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
   const isFixed = fault.state === "fixed";
   const isAssigned = fault.state === "assigned";
 
-  const locationText = fault.reportedBy?.location
-    ? `${fault.reportedBy.location.dorm}, Pokój ${fault.reportedBy.location.room}`
-    : "Brak danych o lokalizacji";
+  const locationText =
+    fault.reportedBy?.dorm && fault.reportedBy?.room
+      ? `${fault.reportedBy.dorm}, Pokój ${fault.reportedBy.room}`
+      : "Brak danych o lokalizacji";
 
   const getStatusColor = () => {
     if (isFixed) return theme.palette.success.main;

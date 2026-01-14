@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { addFault, addReview, deleteFault, editFault, getAllFaults, showFaults, upload } from "../controllers/userController";
 
-import { addReviewSchema, editFaultSchema, newFaultSchema } from "../models/fault.model";
+import { addReviewSchema, editFaultSchema, newFaultSchema } from "../validators/fault.model";
 // @ts-ignore
 import {validate} from "../middleware/validate.js"
 // @ts-ignore

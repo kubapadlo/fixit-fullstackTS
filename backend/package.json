@@ -10,6 +10,8 @@
   "author": "Jakub Padlo",
   "license": "ISC",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",
@@ -23,6 +25,7 @@
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
+    "pg": "^8.17.0",
     "streamifier": "^0.1.1"
   },
   "devDependencies": {
@@ -32,8 +35,11 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/node": "^25.0.8",
+    "@types/pg": "^8.16.0",
     "@types/streamifier": "^0.1.2",
     "nodemon": "^3.1.10",
+    "prisma": "^7.2.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
