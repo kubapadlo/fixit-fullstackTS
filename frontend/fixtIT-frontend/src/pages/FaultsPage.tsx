@@ -1,19 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import getFaults from "../services/getFaults";
-import { useLoggedUserState } from "../store/userStore";
 import FaultCard from "../components/FaultCard";
 import { Box, Typography } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import deleteFault from "../services/deleteFault";
 
 export const FaultsPage = () => {
-  const token = useLoggedUserState((state) => state.accessToken);
-
   const queryclient = useQueryClient();
   const { data, isLoading, isError } = useQuery({
     queryFn: getFaults,
     queryKey: ["faults"],
-    enabled: !!token,
   });
 
   const deleteMutation = useMutation({

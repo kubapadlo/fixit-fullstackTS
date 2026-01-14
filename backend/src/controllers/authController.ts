@@ -87,9 +87,16 @@ const login = async(req: Request,res: Response)=>{
       { expiresIn: "15m" } 
     );
 
-    res.cookie("jwt", refreshToken, {
+    res.cookie("accessToken", accesToken, {
       httpOnly: true, // Niedostępne dla JavaScript, ochrona przed XSS
-      maxAge: 15 * 1000 * 1000,
+      sameSite: "lax",
+      maxAge: 1 * 60 * 1000,  // minuta
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 1000, // godzina
     });
       
     return res.status(200).json({user:{id: user._id, role:user.role, fullName: `${user.firstName} ${user.lastName}`}, accessToken: accesToken, message: "Logged sucessfuly"})
@@ -101,7 +108,7 @@ const login = async(req: Request,res: Response)=>{
 
 const refreshToken = async(req:Request, res:Response) => {
   try {
-    const rtoken = req.cookies?.jwt;
+  const rtoken = req.cookies?.refreshToken;
   if (!rtoken){
     return res.status(401).json({message: "No refresh token in cookie"})
   }
@@ -117,7 +124,13 @@ const refreshToken = async(req:Request, res:Response) => {
     }
     const newAccessToken = jwt.sign({userId: payload.userId, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "1m" }  )
 
-    return res.status(200).json({accessToken: newAccessToken, user:{id: payload.userId, role: payload.role, fullName: `${user.firstName} ${user.lastName}`}})
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true, // Niedostępne dla JavaScript, ochrona przed XSS
+      sameSite: "lax",
+      maxAge: 1 * 60 * 1000,  // minuta
+    });
+
+    return res.status(200).json({user:{id: payload.userId, role: payload.role, fullName: `${user.firstName} ${user.lastName}`}})
   })
   } catch (error) {
     return res.status(500).json({message: "Internal Server Error"})

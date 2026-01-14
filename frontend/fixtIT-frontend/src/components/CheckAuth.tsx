@@ -30,7 +30,7 @@ export default function CheckAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isSuccess && data) {
-      setUser(data.user, data.accessToken);
+      setUser(data.user);
     }
   }, [isSuccess, data, setUser]);
 

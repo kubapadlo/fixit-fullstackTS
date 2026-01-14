@@ -7,21 +7,6 @@ export const api = axios.create({
   withCredentials: true
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = useLoggedUserState.getState().accessToken;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.error("Error with request interceptor: ", error);
-    return Promise.reject(error); 
-  }
-);
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -31,17 +16,12 @@ api.interceptors.response.use(
       originalResponse._retry = true;
 
       try {
-        const res = await api.get("/api/auth/refreshtoken");
+        await api.get("/api/auth/refreshtoken");
 
-        const newToken = res.data.accessToken;
-
-        useLoggedUserState.setState({
-          accessToken: newToken,
-        });
-
-        originalResponse.headers.Authorization = `Bearer ${newToken}`;
+        // nowe ciasteczko z tokenem zostanie dolaczone automatycznie
         return api(originalResponse);
       } catch (error) {
+        useLoggedUserState.getState().logout()
         return Promise.reject(error);
       }
     }
