@@ -1,5 +1,5 @@
 import { Router } from "express";
-import  {register,login, refreshToken, logout}  from "../controllers/authController";
+import { AuthController } from "../controllers/authController"
 
 // middleware
 import {validate} from "../middleware/validate"
@@ -8,9 +8,9 @@ import { userLoginValidationSchema, userRegisterValidationSchema } from "../vali
 
 const authRouter = Router();
 
-authRouter.post("/register", validate(userRegisterValidationSchema), register);
-authRouter.post("/login", validate(userLoginValidationSchema), login);
-authRouter.get("/refreshtoken", refreshToken);
-authRouter.get("/logout", logout)
+authRouter.post("/register", validate(userRegisterValidationSchema), AuthController.register);
+authRouter.post("/login", validate(userLoginValidationSchema), AuthController.login);
+authRouter.get("/refreshtoken", AuthController.refreshToken);
+authRouter.get("/logout", AuthController.logout)
 
 export default authRouter;

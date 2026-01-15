@@ -12,7 +12,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalResponse = error.config;
 
-    if (error.response.status == 401 && !originalResponse._retry) {
+    // unikamy petli
+    if (error.response.status == 401 && !originalResponse._retry && !originalResponse.url.includes('/refresh')) {
       originalResponse._retry = true;
 
       try {
