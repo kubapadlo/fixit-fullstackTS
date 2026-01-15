@@ -8,3 +8,6 @@
 /backend/.env
 
 /note_ss
+
+backend_notes.md 
+frontend_notes.md

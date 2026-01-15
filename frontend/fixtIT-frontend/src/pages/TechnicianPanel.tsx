@@ -81,7 +81,7 @@ const TechnicianPanel = () => {
   const handleSaveDialog = (formData: EditFormData) => {
     if (selectedFault) {
       updateMutation.mutate({
-        id: selectedFault._id,
+        id: selectedFault.id,
         state: formData.state,
         review: formData.review,
       });
@@ -120,12 +120,12 @@ const TechnicianPanel = () => {
         case "category":
           return a.category.localeCompare(b.category);
         case "location":
-          const dormA = a.reportedBy?.location?.dorm || "";
-          const dormB = b.reportedBy?.location?.dorm || "";
+          const dormA = a.reportedBy?.dorm || "";
+          const dormB = b.reportedBy?.dorm || "";
           if (dormA !== dormB) return dormA.localeCompare(dormB);
 
-          const roomA = a.reportedBy?.location?.room || "";
-          const roomB = b.reportedBy?.location?.room || "";
+          const roomA = a.reportedBy?.room || "";
+          const roomB = b.reportedBy?.room || "";
           return roomA.localeCompare(roomB);
         default:
           return 0;
@@ -232,7 +232,7 @@ const TechnicianPanel = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={3} sx={{alignItems: "flex-start"}}>
+        <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
           {processedFaults.length === 0 ? (
             <Grid>
               <Box textAlign="center" py={10} sx={{ color: "text.secondary" }}>
@@ -243,7 +243,7 @@ const TechnicianPanel = () => {
             </Grid>
           ) : (
             processedFaults.map((fault) => (
-              <Grid key={fault._id}>
+              <Grid key={fault.id}>
                 <FaultCard
                   fault={fault}
                   onManage={() => handleOpenManage(fault)}
