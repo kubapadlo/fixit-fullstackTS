@@ -1,6 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
 
-export interface RegisterRequestBody {
+export interface RegisterUserDTO {
   email: string;
   password: string;
   firstName: string;
@@ -11,7 +11,7 @@ export interface RegisterRequestBody {
   };
 }
 
-export interface LoginRequestBody {
+export interface LoginUserDTO {
   email: string;
   password: string;
 }

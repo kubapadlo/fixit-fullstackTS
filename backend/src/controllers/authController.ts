@@ -9,6 +9,7 @@ const cookieOptions = (maxAge: number) => ({
   maxAge
 });
 
+// OBSŁUGA HTTP
 export class AuthController {
   static async register(req: Request, res: Response) {
     try {

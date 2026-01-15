@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../lib/prisma";
-import { RegisterRequestBody, LoginRequestBody, MyJwtPayload } from "../types/user.types";
+import { RegisterUserDTO, LoginUserDTO, MyJwtPayload } from "../types/user.types";
 
+// logika biznesowa, walidacja, dostęp do bazy
 export class AuthService {
-  async register(data: RegisterRequestBody) {
+  async register(data: RegisterUserDTO) {
     const { email, password, firstName, lastName, location } = data;
 
     const alreadyExists = await prisma.user.findUnique({ where: { email } });
@@ -31,7 +32,7 @@ export class AuthService {
     });
   }
 
-  async validateUser(data: LoginRequestBody) {
+  async validateUser(data: LoginUserDTO) {
     const user = await prisma.user.findUnique({ where: { email: data.email } });
     if (!user) throw new Error("USER_NOT_FOUND");
 
