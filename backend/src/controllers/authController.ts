@@ -140,7 +140,11 @@ const refreshToken = async(req:Request, res:Response) => {
 
 const logout = (req:Request, res:Response) => {
   try {
-    res.clearCookie("jwt", {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+    });
+
+    res.clearCookie("refreshToken", {
       httpOnly: true,
     });
 
