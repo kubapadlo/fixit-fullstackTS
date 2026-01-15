@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ObjectSchema } from "joi"; // Zaimportuj typ z Joi
+import { ObjectSchema } from "joi"; 
 
 interface ValidationSchema {
   body?: ObjectSchema;

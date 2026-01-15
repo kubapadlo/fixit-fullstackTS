@@ -16,8 +16,7 @@ describe('Testy API logowania', () => {
       expect(response.status).to.eq(200);
 
       // 3. Sprawdzenie struktury odpowiedzi JSON
-      expect(response.body).to.have.property('accessToken');
-      expect(response.body).to.have.property('message', 'Logged sucessfuly');
+      expect(response.body).to.have.property('message', 'Logged successfully');
       
       // 4. Weryfikacja danych użytkownika
       const user = response.body.user;

@@ -21,7 +21,6 @@ describe('Logowanie E2E', () => {
       
       // Sprawdzam dane zwrócone przez backend
       expect(interception.response?.body.user.role).to.eq('student');
-      expect(interception.response?.body).to.have.property('accessToken');
     });
 
     // Sprawdzam, czy pojawił się Snackbar sukcesu
@@ -31,6 +30,7 @@ describe('Logowanie E2E', () => {
     cy.url().should('eq', 'http://localhost:5173/');
 
     // 7. Sprawdzenie ciasteczka
-    cy.getCookie('jwt').should('exist');
+    cy.getCookie('accessToken').should('exist');
+    cy.getCookie('refreshToken').should('exist');
   });
 });
