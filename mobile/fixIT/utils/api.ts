@@ -9,53 +9,24 @@ export const api = axios.create({
   withCredentials: true
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = useLoggedUserState.getState().accessToken;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.error("Error with request interceptor: ", error);
-    return Promise.reject(error); 
-  }
-);
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalResponse = error.config;
 
-    if (error.response?.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (error.status == 401 && !originalResponse._retry) {
+      originalResponse._retry = true;
 
       try {
-        //Bardzo ważne! Używamy czystego axiosa zamiast "api", 
-        // aby uniknąć pętli nieskończonej i nie wysyłać starego tokena w nagłówku.
-        const res = await api.get("/api/auth/refreshtoken", {
-            withCredentials: true 
-        });
+        await api.get("/api/auth/refreshtoken");
 
-        const newToken = res.data.accessToken;
-
-        useLoggedUserState.setState({
-          accessToken: newToken,
-          isAuthenticated: true
-        });
-
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalRequest);
-        
-      } catch (refreshError) {
-        console.error("Refresh token expired");
-        useLoggedUserState.getState().logout();
-        return Promise.reject(refreshError);
+        // nowe ciasteczko z tokenem zostanie dolaczone automatycznie
+        return api(originalResponse);
+      } catch (error) {
+        useLoggedUserState.getState().logout()
+        return Promise.reject(error);
       }
     }
-
     return Promise.reject(error);
   }
 );

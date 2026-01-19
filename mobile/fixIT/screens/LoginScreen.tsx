@@ -40,7 +40,7 @@ export default function LoginScreen({ navigation }: { navigation: any }) {
     mutationFn: login,
     onSuccess: (data) => {
       Alert.alert("Git");
-      setUser(data.user, data.accessToken);
+      setUser(data.user);
     },
     onError: (error) => {
       Alert.alert("Błąd logowania", error.message);

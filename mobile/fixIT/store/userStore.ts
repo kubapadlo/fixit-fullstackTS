@@ -6,8 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 type UserStore = {
     isAuthenticated : boolean,
     user: User | null,
-    accessToken : string | null,
-    setUser: (user:User, accessToken:string) => void,
+    setUser: (user:User) => void,
     logout: () => void
 }
 
@@ -17,11 +16,10 @@ export const useLoggedUserState = create<UserStore>()(
     (set) => ({
       isAuthenticated: false,
       user: null,
-      accessToken: null,
-      setUser: (user, accessToken) => 
-        set({ isAuthenticated: true, user, accessToken }),
+      setUser: (user) => 
+        set({ isAuthenticated: true, user}),
       logout: () => 
-        set({ isAuthenticated: false, user: null, accessToken: null }),
+        set({ isAuthenticated: false, user: null }),
     }),
     {
       name: 'user-storage',

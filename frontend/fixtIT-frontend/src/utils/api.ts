@@ -12,7 +12,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalResponse = error.config;
 
-    if (error.status == 403 && !originalResponse._retry) {
+    if (error.status == 403 && !originalResponse._retry && !originalResponse.url.includes('/refresh')) {
       originalResponse._retry = true;
 
       try {
