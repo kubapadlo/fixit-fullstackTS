@@ -3,9 +3,6 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import helmet from "helmet";
 import rateLimit from 'express-rate-limit'
-//routery
-import authRouter from "./routers/authRoutes";
-import faultRouter from "./routers/faultRouter";
 
 const app = express();
 
@@ -29,8 +26,5 @@ const limiter = rateLimit({
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());  
-
-app.use("/api/auth", authRouter);
-app.use("/api/user", faultRouter);
 
 export default app;
