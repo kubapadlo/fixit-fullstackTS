@@ -1,0 +1,9 @@
+{
+  "name": "fixit-monorepo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "fixtIT-frontend",
+    "shared"
+  ]
+}

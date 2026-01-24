@@ -2,7 +2,7 @@ import { cloudinary } from "../config/cloudinary";
 import { createReadStream } from 'streamifier';
 import { IFaultRepository } from "../repositories/fault.repository.interface";
 import { IUserRepository } from "../repositories/user.repository.interface";
-import { newFaultBody, updateStateBody } from "../types/fault.types";
+import { CreateFaultDTO, EditFaultDTO, AddReviewDTO, IFault } from "@shared/types/fault";
 
 export class FaultService {
   constructor(
@@ -20,7 +20,7 @@ export class FaultService {
     });
   }
 
-  async createFault(userId: string, data: newFaultBody, fileBuffer?: Buffer) {
+  async createFault(userId: string, data: CreateFaultDTO, fileBuffer?: Buffer) {
     const foundUser = await this.userRepository.findById(userId);
     if (!foundUser) throw new Error("USER_NOT_FOUND");
 
@@ -68,7 +68,7 @@ export class FaultService {
     return await this.faultRepository.updateWithUserCheck(faultId, userId, newData);
   }
 
-  async addReview(faultId: string, technicianId: string, data: updateStateBody) {
+  async addReview(faultId: string, technicianId: string, data: AddReviewDTO) {
     const { state, review } = data;
     const faultToReview = await this.faultRepository.findById(faultId);
 

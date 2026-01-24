@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
+import { LoginResponse, RegisterResponse } from "@shared/index";
 
 const cookieOptions = (maxAge: number) => ({
   httpOnly: true,
@@ -11,7 +12,7 @@ export class AuthController {
   // Wstrzykujemy serwis przez konstruktor
   constructor(private authService: AuthService) {}
 
-  register = async (req: Request, res: Response) => {
+  register = async (req: Request, res: Response<RegisterResponse>) => {
     try {
       const { email, password, firstName, lastName, location } = req.body;
       if (!email || !password || !firstName || !lastName || !location) {
@@ -27,16 +28,16 @@ export class AuthController {
     }
   }
 
-  login = async (req: Request, res: Response) => {
+  login = async (req: Request, res: Response<LoginResponse | {message:string}>) => {
     try {
       const user = await this.authService.validateUser(req.body);
-      const { accessToken, refreshToken } = this.authService.generateTokens(user.id, user.role);
+      const { accessToken, refreshToken } = this.authService.generateTokens(user);
 
       res.cookie("accessToken", accessToken, cookieOptions(1 * 60 * 1000));
       res.cookie("refreshToken", refreshToken, cookieOptions(60 * 60 * 1000));
 
       return res.status(200).json({
-        user: { id: user.id, role: user.role, fullName: `${user.firstName} ${user.lastName}` },
+        user: { id: user.id, role: user.role, fullName: user.fullName },
         message: "Logged successfully"
       });
     } catch (error: any) {
@@ -47,17 +48,17 @@ export class AuthController {
     }
   }
 
-  refreshToken = async (req: Request, res: Response) => {
+  refreshToken = async (req: Request, res: Response<LoginResponse | { message: string }>) => {
     try {
       const token = req.cookies?.refreshToken;
       if (!token) return res.status(401).json({ message: "No refresh token" });
 
       const user = await this.authService.verifyRefreshToken(token);
-      const { accessToken } = this.authService.generateTokens(user.id, user.role);
+      const { accessToken } = this.authService.generateTokens(user);
 
       res.cookie("accessToken", accessToken, cookieOptions(1 * 60 * 1000));
       return res.status(200).json({
-        user: { id: user.id, role: user.role, fullName: `${user.firstName} ${user.lastName}` }
+        user: { id: user.id, role: user.role, fullName: user.fullName }, message: "Token refreshed successfully"
       });
     } catch (error: any) {
       res.clearCookie("accessToken", { httpOnly: true });

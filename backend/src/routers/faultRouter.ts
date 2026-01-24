@@ -6,7 +6,7 @@ import { Request } from "express";
 import { FaultController } from "../controllers/faultController";
 
 // Schematy walidacji
-import { addReviewSchema, editFaultSchema, newFaultSchema } from "../models/fault.model";
+import { newFaultSchema, editFaultSchema, addReviewSchema } from "@shared/types/fault";
 
 // Middleware
 import { validate } from "../middleware/validate";

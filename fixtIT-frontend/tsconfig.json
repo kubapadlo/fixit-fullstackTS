@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "rootDir": "..",  
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "../shared/src/**/*.ts", 
+  ],
+}

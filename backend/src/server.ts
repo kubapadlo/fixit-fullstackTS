@@ -1,8 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
+import {connectDB} from "./config/db";
 import app from "./app";
-import { connectDB } from "./config/db";
 
 // Repozytoria
 import { PrismaUserRepository } from "./repositories/prisma/user.prisma.repository";
@@ -25,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 async function startServer(): Promise<void> {
   try {
     // 1. Połączenie z bazą (na podstawie DB_TYPE w .env)
-    //await connectDB();
+    await connectDB();
 
     // 2. Wstrzykiwanie zależności - WARSTWA DANYCH
     const userRepository = process.env.DB_TYPE === "mongo" 

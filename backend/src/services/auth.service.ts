@@ -1,70 +1,115 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { IUserRepository } from "../repositories/user.repository.interface";
-import { RegisterUserDTO, LoginUserDTO, MyJwtPayload } from "../types/user.types";
+// Zakładam, że te typy są importowane z pliku, który podałeś
+import { 
+  RegisterDTO, 
+  LoginDTO, 
+  AuthUser, 
+  User, 
+  UserRole 
+} from "@shared/types/user";
+import { MyJwtPayload } from "../types/user.types";
 
 export class AuthService {
   constructor(private userRepository: IUserRepository) {}
 
-  async register(data: RegisterUserDTO) {
+  /**
+   * Mapuje surowe dane z bazy na ustandaryzowany obiekt AuthUser (używany w tokenach/sesji)
+   */
+  private mapToAuthUser(user: any): AuthUser {
+    return {
+      id: user.id || user._id?.toString(),
+      fullName: user.fullName || `${user.firstName} ${user.lastName}`,
+      role: user.role as UserRole,
+    };
+  }
+
+  /**
+   * Mapuje dane na pełny obiekt User (jeśli potrzebujesz pełnych danych profilowych)
+   */
+  private mapToUser(user: any): User {
+    return {
+      id: user.id || user._id?.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role as UserRole,
+      location: user.location,
+    };
+  }
+
+  async register(data: RegisterDTO): Promise<User> {
     const alreadyExists = await this.userRepository.findByEmail(data.email);
     if (alreadyExists) throw new Error("USER_ALREADY_EXISTS");
 
-    const count = await this.userRepository.countByLocation(data.location.dorm, data.location.room);
-    if (count >= 2) throw new Error("ROOM_FULL");
+    // Logika biznesowa: tylko studenci mają limit w pokoju
+    if (data.role === "student" && data.location) {
+      const count = await this.userRepository.countByLocation(
+        data.location.dorm, 
+        data.location.room
+      );
+      if (count >= 2) throw new Error("ROOM_FULL");
+    }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
-
-    return await this.userRepository.create({
+    
+    // Tworzymy użytkownika w bazie
+    const newUser = await this.userRepository.create({
       ...data,
+      //role: "student", 
       passwordHash: hashedPassword,
-      //role: "student"
     });
+
+    // Zwracamy pełny obiekt User zgodnie z Twoim interfejsem
+    return this.mapToUser(newUser);
   }
 
-  async validateUser(data: LoginUserDTO) {
+  async validateUser(data: LoginDTO): Promise<AuthUser> {
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) throw new Error("USER_NOT_FOUND");
 
     const isValid = await bcrypt.compare(data.password, user.passwordHash);
     if (!isValid) throw new Error("INVALID_CREDENTIALS");
 
-    // Unifikacja ID (Mongo używa _id, Prisma id)
-    return {
-      id: user.id || user._id.toString(),
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName
-    };
+    // Do celów logowania zwracamy AuthUser (id, fullName, role)
+    return this.mapToAuthUser(user);
   }
 
-  generateTokens(userId: string, role: string) {
+  generateTokens(user: AuthUser) {
+    const payload: MyJwtPayload = { 
+      userId: user.id, 
+      role: user.role 
+    };
+    
     const accessToken = jwt.sign(
-      { userId, role },
-      process.env.SECRET_ACCESS_KEY as string,
-      { expiresIn: "1m" }
+      payload, 
+      process.env.SECRET_ACCESS_KEY!, 
+      { expiresIn: "15m" }
     );
+    
     const refreshToken = jwt.sign(
-      { userId, role },
-      process.env.SECRET_REFRESH_KEY as string,
-      { expiresIn: "1h" }
+      payload, 
+      process.env.SECRET_REFRESH_KEY!, 
+      { expiresIn: "7d" }
     );
+
     return { accessToken, refreshToken };
   }
 
-  async verifyRefreshToken(token: string) {
+  async verifyRefreshToken(token: string): Promise<AuthUser> {
     try {
-      const decoded = jwt.verify(token, process.env.SECRET_REFRESH_KEY as string) as MyJwtPayload;
+      const decoded = jwt.verify(
+        token, 
+        process.env.SECRET_REFRESH_KEY!
+      ) as MyJwtPayload;
+
       const user = await this.userRepository.findById(decoded.userId);
       if (!user) throw new Error("USER_NOT_FOUND");
-      return {
-        id: user.id || user._id.toString(),
-        role: user.role,
-        firstName: user.firstName,
-        lastName: user.lastName
-      };
+
+      return this.mapToAuthUser(user);
     } catch (err) {
-      throw new Error("INVALID_TOKEN");
+      throw new Error("INVALID_REFRESH_TOKEN");
     }
   }
 }

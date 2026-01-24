@@ -1,28 +1,33 @@
 import { Request, Response, NextFunction } from "express";
-import { ObjectSchema } from "joi"; 
+import { ZodObject, ZodError } from "zod";
 
-interface ValidationSchema {
-  body?: ObjectSchema;
-  query?: ObjectSchema;
-  params?: ObjectSchema;
-}
-
-export const validate = (schema: ValidationSchema) => (req: Request, res: Response, next: NextFunction)=> {
-  const parts = ["body", "query", "params"] as const;
-  
-  for (const part of parts) {
-    if (schema[part]) {
-      const { error, value } = schema[part].validate(req[part], {
-        abortEarly: false,
+export const validate = (schema: ZodObject<any>) => 
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Zod sprawdzi body, query i params jednocześnie, jeśli zdefiniujesz je w schemacie
+      const parsed = await schema.parseAsync({
+        body: req.body,
+        query: req.query,
+        params: req.params,
       });
-      if (error) {
+
+      // Nadpisujemy dane tymi przefiltrowanymi przez Zod (bezpieczeństwo)
+      if (parsed.body) req.body = parsed.body;
+      if (parsed.query) req.query = parsed.query as any;
+      if (parsed.params) req.params = parsed.params as any;
+      
+      next();
+    } catch (error) {
+      console.error("VALIDATION MIDDLEWARE ERROR:", error);
+      if (error instanceof ZodError) {
         return res.status(400).json({
           message: "Validation error",
-          errors: error.details.map((d) => d.message),
+          errors: error.issues.map((err) => ({
+            path: err.path.join("."),
+            message: err.message,
+          })),
         });
       }
-      req[part] = value;
+      return res.status(500).json({ message: "Internal server error" });
     }
-  }
-  next();
-};
+  };
