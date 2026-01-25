@@ -4,14 +4,13 @@ import { ZodObject, ZodError } from "zod";
 export const validate = (schema: ZodObject<any>) => 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Zod sprawdzi body, query i params jednocześnie, jeśli zdefiniujesz je w schemacie
       const parsed = await schema.parseAsync({
         body: req.body,
         query: req.query,
         params: req.params,
       });
 
-      // Nadpisujemy dane tymi przefiltrowanymi przez Zod (bezpieczeństwo)
+      // Nadpisujemy dane tymi przefiltrowanymi przez Zod
       if (parsed.body) req.body = parsed.body;
       if (parsed.query) req.query = parsed.query as any;
       if (parsed.params) req.params = parsed.params as any;

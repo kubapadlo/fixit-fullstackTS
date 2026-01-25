@@ -7,7 +7,7 @@ import deleteFault from "../services/deleteFault";
 
 export const FaultsPage = () => {
   const queryclient = useQueryClient();
-  const { data, isLoading, isError } = useQuery({
+  const { data =[], isLoading, isError } = useQuery({
     queryFn: getFaults,
     queryKey: ["faults"],
   });
@@ -50,7 +50,7 @@ export const FaultsPage = () => {
     >
       {data.map((fault) => (
         <FaultCard
-          key={fault.id}
+          key={fault._id}
           category={fault.category}
           description={fault.description}
           reportedAt={fault.reportedAt}
@@ -59,7 +59,7 @@ export const FaultsPage = () => {
           onDelete={(id) => {
             handleDelete(id);
           }}
-          id={fault.id}
+          id={fault._id}
         />
       ))}
       {deleteMutation.isPending && (

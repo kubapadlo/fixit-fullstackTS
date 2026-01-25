@@ -16,7 +16,7 @@ import {
   Build as BuildIcon,
   LocationOn as LocationIcon,
 } from "@mui/icons-material";
-import type { FaultWithUserObject } from "../../types/fault.type";
+import type { FaultWithUserObject } from "@fixit/shared/src/types/fault";
 import { getCategoryDetails } from "../../utils/categoryHelpers";
 
 interface FaultCardProps {
@@ -30,10 +30,9 @@ const FaultCard: React.FC<FaultCardProps> = ({ fault, onManage }) => {
 
   const isFixed = fault.state === "fixed";
   const isAssigned = fault.state === "assigned";
-
   const locationText =
-    fault.reportedBy?.dorm && fault.reportedBy?.room
-      ? `${fault.reportedBy.dorm}, Pokój ${fault.reportedBy.room}`
+    fault.reportedBy?.location?.dorm && fault.reportedBy?.location?.room
+      ? `${fault.reportedBy.location.dorm}, Pokój ${fault.reportedBy.location.room}`
       : "Brak danych o lokalizacji";
 
   const getStatusColor = () => {

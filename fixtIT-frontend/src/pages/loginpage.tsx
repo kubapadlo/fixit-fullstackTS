@@ -15,6 +15,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 
 import { loginFieldSchema, type LoginDTO } from "@fixit/shared/src/types/user";
+import { mapUserFromApi } from "../mappers/faultMapper";
 
 export function LoginPage() {
   // zustand
@@ -39,7 +40,7 @@ export function LoginPage() {
       enqueueSnackbar(`Udało się zalogować jako ${data.user.role}`, {
         variant: "success",
       });
-      setUser(data.user);
+      setUser(mapUserFromApi(data.user));
       if (data.user.role === "technician") navigate("/dashboard");
       else navigate("/");
     },

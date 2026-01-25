@@ -1,12 +1,12 @@
 import { isAxiosError } from 'axios'
 import {api} from '../utils/api'
-
-import type { FaultWithUserObject } from '../types/fault.type';
+import { GetUserFaultsResponse } from '@shared/types/fault';
+import { mapFaultFromApi } from "../mappers/faultMapper";
 
 export default async function getAllFaults(){
     try {
-        const res = await api.get<FaultWithUserObject[]>('/api/user/getAllFaults')
-        return res.data;
+        const res = await api.get<GetUserFaultsResponse>('/api/user/getAllFaults')
+        return res.data.faults.map(mapFaultFromApi);
     } catch (error) {
         if(isAxiosError(error)){
             throw new Error(error.message)

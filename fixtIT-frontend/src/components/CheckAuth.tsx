@@ -3,6 +3,7 @@ import { refresh } from "../services/refresh";
 import { useLoggedUserState } from "../store/userStore";
 import { useEffect, useRef } from "react"; // Dodaj useState
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { mapUserFromApi } from "../mappers/faultMapper";
 
 export default function CheckAuth({ children }: { children: React.ReactNode }) {
   const { user, setUser, logout } = useLoggedUserState();
@@ -30,7 +31,7 @@ export default function CheckAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isSuccess && data) {
-      setUser(data.user);
+      setUser(mapUserFromApi(data.user));
     }
   }, [isSuccess, data, setUser]);
 

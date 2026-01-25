@@ -1,3 +1,4 @@
+import { FaultWithUserID, FaultWithUserObject } from "@shared/types/fault";
 import {Fault} from "../../models/fault.model" // Zakładam że masz taki model
 import { IFaultRepository } from "../fault.repository.interface";
 
@@ -18,12 +19,12 @@ export class MongooseFaultRepository implements IFaultRepository {
   }
 
   async findAllWithUser() {
-    return Fault.find().populate('reportedBy', 'firstName lastName dorm room');
+    return Fault.find().populate('reportedBy');
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: any): Promise<any> {
     return Fault.findByIdAndUpdate(id, data, { new: true });
-  }
+}
 
   async updateWithUserCheck(id: string, userId: string, data: any) {
     return Fault.findOneAndUpdate({ _id: id, reportedBy: userId }, data, { new: true });

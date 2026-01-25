@@ -1,3 +1,4 @@
+import { FaultWithUserObject } from "@shared/types/fault";
 import { prisma } from "../../../lib/prisma";
 import { IFaultRepository } from "../fault.repository.interface";
 
@@ -24,7 +25,7 @@ export class PrismaFaultRepository implements IFaultRepository {
     });
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: any): Promise<any> {
     return prisma.fault.update({ where: { id }, data });
   }
 

@@ -6,7 +6,7 @@ import { Request } from "express";
 import { FaultController } from "../controllers/faultController";
 
 // Schematy walidacji
-import { newFaultSchema, editFaultSchema, addReviewSchema } from "@shared/types/fault";
+import { addReviewRequestSchema, deleteFaultParamsSchema, createFaultRequestSchema } from "@shared/types/fault";
 
 // Middleware
 import { validate } from "../middleware/validate";
@@ -30,52 +30,22 @@ export const createFaultRouter = (faultController: FaultController) => {
   const faultRouter = Router();
 
   // Dodawanie usterki
-  faultRouter.post(
-    "/addFault", 
-    verifyJWT, 
-    upload, 
-    multerErrorHandler, 
-    validate(newFaultSchema), 
-    faultController.addFault
-  );
+  faultRouter.post("/addFault", verifyJWT, upload, multerErrorHandler, validate(createFaultRequestSchema), faultController.addFault);
 
   // Usterki zalogowanego użytkownika
-  faultRouter.get(
-    "/showFaults", 
-    verifyJWT, 
-    faultController.showFaults
-  );
+  faultRouter.get("/showFaults", verifyJWT, faultController.showFaults);
 
   // Wszystkie usterki (publiczne lub dla admina)
-  faultRouter.get(
-    "/getAllFaults", 
-    faultController.getAllFaults
-  );
+  faultRouter.get("/getAllFaults", faultController.getAllFaults);
 
-  // Edycja usterki
-  faultRouter.put(
-    '/:faultID/edit', 
-    verifyJWT, 
-    upload, 
-    validate(editFaultSchema), 
-    faultController.editFault
-  );
+  // Edycja usterki - aktualnie nieużywany endpoint
+  // faultRouter.put('/:faultID/edit', verifyJWT, upload, validate(editFaultSchema), faultController.editFault);
 
   // Dodawanie recenzji (tylko dla technika)
-  faultRouter.put(
-    '/:faultID/review', 
-    verifyJWT, 
-    verifyRole('technician'), 
-    validate(addReviewSchema), 
-    faultController.addReview
-  );
+  faultRouter.put('/:faultID/review', verifyJWT, verifyRole('technician'), validate(addReviewRequestSchema), faultController.addReview);
 
   // Usuwanie usterki
-  faultRouter.delete(
-    '/:faultID/delete', 
-    verifyJWT, 
-    faultController.deleteFault
-  );
+  faultRouter.delete('/:faultID/delete', verifyJWT, validate(deleteFaultParamsSchema), faultController.deleteFault);
 
   return faultRouter;
 };

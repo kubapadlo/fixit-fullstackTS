@@ -1,15 +1,10 @@
 import { isAxiosError } from "axios";
 import { api } from "../utils/api";
+import { AddReviewDTO, AddReviewResponse } from "@shared/index";
 
-export interface UpdateFaultParams {
-  id: string;
-  state: 'reported' | 'assigned' | 'fixed';
-  review: string;
-}
-
-export async function updateFaultStatus({ id, state, review }: UpdateFaultParams): Promise<void> {
+export async function updateFaultStatus(faultID: string, data: AddReviewDTO){
   try {
-    await api.put(`/api/user/${id}/review`, { state, review });
+    await api.put<AddReviewResponse>(`/api/user/${faultID}/review`, data);
   } catch (error) {
     if (isAxiosError(error)) {
       throw new Error(error.response?.data?.message || error.message);

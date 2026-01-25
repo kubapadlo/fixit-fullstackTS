@@ -2,7 +2,7 @@ import { cloudinary } from "../config/cloudinary";
 import { createReadStream } from 'streamifier';
 import { IFaultRepository } from "../repositories/fault.repository.interface";
 import { IUserRepository } from "../repositories/user.repository.interface";
-import { CreateFaultDTO, EditFaultDTO, AddReviewDTO, IFault } from "@shared/types/fault";
+import { CreateFaultDTO, EditFaultDTO, AddReviewDTO, IFault, FaultWithUserObject, FaultWithUserID } from "@shared/types/fault";
 
 export class FaultService {
   constructor(
@@ -70,17 +70,16 @@ export class FaultService {
 
   async addReview(faultId: string, technicianId: string, data: AddReviewDTO) {
     const { state, review } = data;
-    const faultToReview = await this.faultRepository.findById(faultId);
+    const faultToReview: FaultWithUserObject | null = await this.faultRepository.findById(faultId);
 
     if (!faultToReview) throw new Error("FAULT_NOT_FOUND");
-    
-    const assignedId = faultToReview.assignedToId || faultToReview.assignedTo;
-    if (assignedId && assignedId !== technicianId) throw new Error("ASSIGNED_TO_OTHER");
+    console.log(technicianId, faultToReview.assignedTo);
+    if (faultToReview.assignedTo && faultToReview.assignedTo.toString() !== technicianId) throw new Error("ASSIGNED_TO_OTHER");
     if (faultToReview.state === 'reported' && state === "fixed") throw new Error("NOT_ASSIGNED_YET");
     if (faultToReview.state === 'fixed' && state !== 'fixed') throw new Error("CANNOT_UNDO_FIXED");
 
-    const updateData: any = { state };
-    if (state === "assigned") updateData.assignedToId = technicianId;
+    const updateData: Partial<FaultWithUserObject> = { state };
+    if (state === "assigned") updateData.assignedTo = technicianId;
     if (state === "fixed") updateData.review = review ?? faultToReview.review;
 
     return await this.faultRepository.update(faultId, updateData);
@@ -88,8 +87,9 @@ export class FaultService {
 
   async deleteFault(faultId: string, userId: string) {
     const fault = await this.faultRepository.findById(faultId);
-
+    console.log(userId, fault?.reportedBy._id.toString());
     if (!fault) throw new Error("FAULT_NOT_FOUND");
+    if (fault?.reportedBy._id.toString() !== userId) throw new Error("DELETE_FORBIDDEN");
     if (fault.state === "assigned" || fault.state === "fixed") throw new Error("DELETE_FORBIDDEN");
 
     const result = await this.faultRepository.delete(faultId);

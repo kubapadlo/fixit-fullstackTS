@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
-import { LoginResponse, RegisterResponse } from "@shared/index";
+import { LoginDTO, LoginResponse, RegisterDTO, RegisterResponse } from "@shared/index";
 
 const cookieOptions = (maxAge: number) => ({
   httpOnly: true,
@@ -12,7 +12,7 @@ export class AuthController {
   // Wstrzykujemy serwis przez konstruktor
   constructor(private authService: AuthService) {}
 
-  register = async (req: Request, res: Response<RegisterResponse>) => {
+  register = async (req: Request<{}, {}, RegisterDTO>, res: Response<RegisterResponse>) => {
     try {
       const { email, password, firstName, lastName, location } = req.body;
       if (!email || !password || !firstName || !lastName || !location) {
@@ -28,11 +28,10 @@ export class AuthController {
     }
   }
 
-  login = async (req: Request, res: Response<LoginResponse | {message:string}>) => {
+  login = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | {message:string}>) => {
     try {
       const user = await this.authService.validateUser(req.body);
       const { accessToken, refreshToken } = this.authService.generateTokens(user);
-
       res.cookie("accessToken", accessToken, cookieOptions(1 * 60 * 1000));
       res.cookie("refreshToken", refreshToken, cookieOptions(60 * 60 * 1000));
 
@@ -48,7 +47,7 @@ export class AuthController {
     }
   }
 
-  refreshToken = async (req: Request, res: Response<LoginResponse | { message: string }>) => {
+  refreshToken = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | { message: string }>) => {
     try {
       const token = req.cookies?.refreshToken;
       if (!token) return res.status(401).json({ message: "No refresh token" });

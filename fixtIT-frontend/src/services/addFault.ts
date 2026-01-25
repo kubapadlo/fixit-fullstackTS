@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios';
 import { api } from '../utils/api';
+import { CreateFaultResponse } from '@shared/index';
 
 interface addFaultParms {
     category: string;
@@ -15,8 +16,8 @@ export async function addFault({ category, description, image }: addFaultParms) 
         if(image){
             formData.append("image", image);
         }
-    
-        const res = await api.post('/api/user/addFault',formData, {headers: {'Content-Type': 'multipart/form-data'}});
+        
+        const res = await api.post<CreateFaultResponse>('/api/user/addFault', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
         return res.data;
     } catch (error) {
         if (isAxiosError(error)) {

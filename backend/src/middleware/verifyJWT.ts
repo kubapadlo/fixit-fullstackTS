@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { MyJwtPayload } from "../types/user.types";
+import { MyJwtPayload } from "../types/auth.types";
 
 export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.accessToken

@@ -18,22 +18,18 @@ import {
   Close as CloseIcon,
   CheckCircle as CheckCircleIcon,
   ErrorOutline as ReportIcon,
-  Construction as ConstructionIcon, // Dodano ikonę dla statusu "assigned"
+  Construction as ConstructionIcon,
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
-import type { FaultWithUserObject } from "../../types/fault.type";
+import { zodResolver } from "@hookform/resolvers/zod"; 
+import { addReviewSchema, type AddReviewDTO, FaultWithUserObject } from "@fixit/shared/src/types/fault"; 
 
 interface EditDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: EditFormData) => void;
+  onSave: (data: AddReviewDTO) => void; 
   fault: FaultWithUserObject | null;
   isSaving: boolean;
-}
-
-export interface EditFormData {
-  state: "reported" | "assigned" | "fixed";
-  review: string;
 }
 
 const EditFaultDialog: React.FC<EditDialogProps> = ({
@@ -43,26 +39,32 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
   fault,
   isSaving,
 }) => {
-  const { control, handleSubmit, reset, watch } = useForm<EditFormData>({
+  const { 
+    control, 
+    handleSubmit, 
+    reset, 
+    watch,
+    formState: { errors } 
+  } = useForm<AddReviewDTO>({
+    resolver: zodResolver(addReviewSchema), 
     defaultValues: {
       state: "reported",
       review: "",
     },
   });
 
-  // Obserwujemy zmianę stanu, aby walidować review
   const currentState = watch("state");
 
   useEffect(() => {
     if (fault && open) {
       reset({
-        state: fault.state as "reported" | "assigned" | "fixed",
+        state: fault.state,
         review: fault.review || "",
       });
     }
   }, [fault, open, reset]);
 
-  const onSubmit = (data: EditFormData) => {
+  const onSubmit = (data: AddReviewDTO) => {
     onSave(data);
   };
 
@@ -77,31 +79,26 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
             justifyContent: "space-between",
             alignItems: "center",
             bgcolor: "background.paper",
-            color: "text.primary",
           }}
         >
           Zarządzanie usterką
-          <IconButton
-            onClick={onClose}
-            size="small"
-            sx={{ color: "text.secondary" }}
-          >
+          <IconButton onClick={onClose} size="small">
             <CloseIcon />
           </IconButton>
         </DialogTitle>
+
         <DialogContent dividers sx={{ bgcolor: "background.paper" }}>
+          {/* Opis zgłoszenia */}
           <Box mb={3}>
             <Typography variant="subtitle2" gutterBottom color="text.secondary">
               Opis zgłoszenia:
             </Typography>
             <Typography
               variant="body1"
-              paragraph
               sx={{
                 bgcolor: "background.default",
                 p: 2,
                 borderRadius: 1,
-                color: "text.primary",
                 border: (theme) => `1px solid ${theme.palette.divider}`,
               }}
             >
@@ -109,68 +106,50 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
             </Typography>
           </Box>
 
+          {/* Status Select */}
           <Box mb={3}>
             <Controller
               name="state"
               control={control}
               render={({ field }) => (
-                <FormControl fullWidth variant="outlined">
-                  <InputLabel sx={{ color: "text.secondary" }}>
-                    Status
-                  </InputLabel>
-                  <Select
-                    {...field}
-                    label="Status"
-                    sx={{ color: "text.primary" }}
-                  >
+                <FormControl fullWidth error={!!errors.state}>
+                  <InputLabel>Status</InputLabel>
+                  <Select {...field} label="Status">
                     <MenuItem value="reported">
                       <Box display="flex" alignItems="center" gap={1}>
                         <ReportIcon color="warning" fontSize="small" />
-                        <Typography color="text.primary">
-                          Zgłoszone (Wolne)
-                        </Typography>
+                        <Typography>Zgłoszone (Wolne)</Typography>
                       </Box>
                     </MenuItem>
-
                     <MenuItem value="assigned">
                       <Box display="flex" alignItems="center" gap={1}>
                         <ConstructionIcon color="info" fontSize="small" />
-                        <Typography color="text.primary">
-                          W trakcie realizacji (Moje)
-                        </Typography>
+                        <Typography>W trakcie realizacji (Moje)</Typography>
                       </Box>
                     </MenuItem>
-
                     <MenuItem value="fixed">
                       <Box display="flex" alignItems="center" gap={1}>
                         <CheckCircleIcon color="success" fontSize="small" />
-                        <Typography color="text.primary">
-                          Zakończone (Naprawione)
-                        </Typography>
+                        <Typography>Zakończone (Naprawione)</Typography>
                       </Box>
                     </MenuItem>
                   </Select>
+                  {errors.state && (
+                    <Typography variant="caption" color="error">
+                      {errors.state.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
           </Box>
 
+          {/* Review TextField */}
           <Box>
             <Controller
               name="review"
               control={control}
-              rules={{
-                validate: (value) => {
-                  if (
-                    currentState === "fixed" &&
-                    (!value || value.trim().length < 5)
-                  ) {
-                    return "Przy oznaczaniu jako 'Naprawione' wymagana jest krótka notatka (min. 5 znaków).";
-                  }
-                  return true;
-                },
-              }}
-              render={({ field, fieldState: { error } }) => (
+              render={({ field }) => (
                 <TextField
                   {...field}
                   label="Notatka technika / Raport z naprawy"
@@ -183,30 +162,22 @@ const EditFaultDialog: React.FC<EditDialogProps> = ({
                       ? "Opisz co zostało naprawione..."
                       : "Opcjonalna notatka..."
                   }
-                  error={!!error}
+                  error={!!errors.review}
                   helperText={
-                    error
-                      ? error.message
-                      : currentState === "fixed"
-                      ? "Wymagane do zamknięcia zgłoszenia"
-                      : "Opcjonalne"
+                    errors.review 
+                      ? errors.review.message 
+                      : currentState === "fixed" 
+                        ? "Wymagane do zamknięcia" 
+                        : "Opcjonalne (według schematu min. 1 znak)"
                   }
-                  sx={{
-                    "& .MuiInputBase-input": { color: "text.primary" },
-                    "& .MuiInputLabel-root": { color: "text.secondary" },
-                  }}
                 />
               )}
             />
           </Box>
         </DialogContent>
+
         <DialogActions sx={{ p: 2, bgcolor: "background.paper" }}>
-          <Button
-            onClick={onClose}
-            color="inherit"
-            disabled={isSaving}
-            sx={{ color: "text.secondary" }}
-          >
+          <Button onClick={onClose} color="inherit" disabled={isSaving}>
             Anuluj
           </Button>
           <Button

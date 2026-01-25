@@ -1,27 +1,35 @@
 import { z } from "zod";
+import { IUserBase } from "./user";
 
+// ------------------- POMOCNICZE -------------------
 export const FAULT_CATEGORIES = ['Elektryk', 'Hydraulik', 'Murarz', 'Malarz', 'Stolarz', 'Ślusarz'] as const;
 export const FAULT_STATES = ['reported', 'assigned', 'fixed'] as const;
 
 export type FaultCategory = typeof FAULT_CATEGORIES[number];
 export type FaultState = typeof FAULT_STATES[number];
+// ---------------------------------------------------
 
-// --- DOMAIN MODEL ---
-export interface IFault {
+// ------------------ TYP DOMENOWY ---------------------
+export interface IFault<TUser> {
   id: string;
-  reportedById: string;
-  reportedAt: Date;
-  category: FaultCategory;
+  reportedAt: string;  
+  reportedBy: TUser;
+  category: 'Elektryk' | 'Hydraulik' | 'Murarz' | 'Malarz' | 'Stolarz' | 'Ślusarz';
   description: string;
-  state: FaultState;
-  assignedToId?: string;
-  review?: string;
-  imageURL?: string;
-  imageID?: string;
+  imageID: string;
+  imageURL: string;
+  review: string;
+  state: "reported" | "assigned" | "fixed";
+  assignedTo: string | null;
+  __v?: number;
 }
 
-// --- ZOD SCHEMAS ---
+export type FaultWithUserID = IFault<string>;
+export type FaultWithUserObject = IFault<IUserBase>;
+// ---------------------------------------------------
 
+
+// ------------------- ZOD SCHEMAS ------------------
 export const newFaultSchema = z.object({
   category: z.enum(FAULT_CATEGORIES).default('Elektryk'),
   description: z.string().min(5, "Opis musi mieć min. 5 znaków"),
@@ -30,7 +38,6 @@ export const newFaultSchema = z.object({
   imageURL: z.string().url().optional().or(z.literal('')),
   imageID: z.string().optional().or(z.literal('')),
 }).refine(data => {
-  // Logika Joi .and('imageURL', 'imageID')
   if ((data.imageURL && !data.imageID) || (!data.imageURL && data.imageID)) {
     return false;
   }
@@ -48,8 +55,50 @@ export const addReviewSchema = z.object({
   review: z.string().min(1, "Review cannot be empty"),
   state: z.enum(FAULT_STATES)
 });
+// ----------------------------------------------------------------
 
-// --- DTOs ---
+// --------------- schematy dla walidatora --------------------
+export const createFaultRequestSchema = z.object({
+  body: newFaultSchema,
+});
+
+export const addReviewRequestSchema = z.object({
+  body: addReviewSchema,
+  params: z.object({
+    faultID: z.string().min(1),
+  }),
+});
+
+export const deleteFaultParamsSchema = z.object({
+  params: z.object({
+    faultID: z.string().min(1),
+  }),
+});     
+
+// --------------------------------------------------------
+
+
+
+// -------------------- DTO (typy requestow) ---------------
 export type CreateFaultDTO = z.infer<typeof newFaultSchema>;
 export type EditFaultDTO = z.infer<typeof editFaultSchema>;
 export type AddReviewDTO = z.infer<typeof addReviewSchema>;
+// --------------------------------------------------------
+
+
+// --------------------- RESPONSE TYPES ---------------------
+export type CreateFaultResponse = {
+  newFault: FaultWithUserID | FaultWithUserObject;
+  message: string;
+};
+
+export type GetUserFaultsResponse = {
+  faults: FaultWithUserObject[];
+  message:string;
+};
+
+export type AddReviewResponse = {
+  faultToReview: FaultWithUserObject | FaultWithUserID;
+  message: string;
+};
+// -----------------------------------------------------------

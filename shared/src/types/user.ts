@@ -8,7 +8,23 @@ export const locationSchema = z.object({
   room: z.string().min(1, "Room is required"),
 });
 
-// -------------- pola do formsów ---------------------
+// --------------------- TYP DOMENOWY --------------------
+export interface IUserBase {
+  id: string; 
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  location?: {
+    dorm: string;
+    room: string;
+  };
+}
+
+export type User = IUserBase;
+// ------------------------------------------------------
+
+// -------------- ZOD SCHEMAS ---------------------
 export const registerFieldSchema = z.object({
   email: z.email("Invalid email"),
   password: z.string().min(4, "Min 4 characters"),
@@ -40,7 +56,7 @@ export const registerRequestSchema = z.object({
 export const loginRequestSchema = z.object({
   body: loginFieldSchema,
 });
-// ------------------------------------------------------
+// ------------------------------------------------------------
 
 
 
@@ -67,17 +83,3 @@ export interface RegisterResponse{
     message: string
 }
 // -----------------------------------------------------------
-
-export interface IUserBase {
-  id: string; 
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
-  location?: {
-    dorm: string;
-    room: string;
-  };
-}
-
-export type User = IUserBase;

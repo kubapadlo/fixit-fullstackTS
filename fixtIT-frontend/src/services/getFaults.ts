@@ -1,15 +1,10 @@
 import { isAxiosError } from 'axios'
 import {api} from '../utils/api'
-
-import type { FaultWithUserID } from '../types/fault.type';
-
-export interface FaultsResponse {
-  faults: FaultWithUserID[];
-}
+import { GetUserFaultsResponse } from '@shared/types/fault';
 
 export default async function getFaults(){
     try {
-        const res = await api.get<FaultsResponse>('/api/user/showFaults')
+        const res = await api.get<GetUserFaultsResponse>('/api/user/showFaults')
         return res.data.faults;
     } catch (error) {
         if(isAxiosError(error)){

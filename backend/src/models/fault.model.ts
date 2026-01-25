@@ -1,12 +1,22 @@
 import mongoose, { Schema, Model, model } from "mongoose";
-import { IFault } from "../types/fault.types";
-import Joi from "joi";
+
+interface IFault extends Document {
+  reportedBy: String;
+  reportedAt : Date;
+  category: string;
+  description: string;
+  state: string;
+  assignedTo: String;
+  review: string;
+  imageURL: string
+  imageID: string  
+}
 
 const faultSchema : Schema<IFault> = new Schema({
-    reportedBy : {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: [true, 'userid is required']
+  reportedBy : {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, 'userid is required']
     },
   reportedAt : {
     type: Date,

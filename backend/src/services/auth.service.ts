@@ -9,7 +9,7 @@ import {
   User, 
   UserRole 
 } from "@shared/types/user";
-import { MyJwtPayload } from "../types/user.types";
+import { MyJwtPayload } from "../types/auth.types";
 
 export class AuthService {
   constructor(private userRepository: IUserRepository) {}
@@ -68,7 +68,7 @@ export class AuthService {
   async validateUser(data: LoginDTO): Promise<AuthUser> {
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) throw new Error("USER_NOT_FOUND");
-
+    
     const isValid = await bcrypt.compare(data.password, user.passwordHash);
     if (!isValid) throw new Error("INVALID_CREDENTIALS");
 

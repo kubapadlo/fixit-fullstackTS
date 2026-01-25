@@ -1,3 +1,5 @@
+import { FaultWithUserID, FaultWithUserObject } from "@shared/types/fault";
+
 export interface IFaultRepository {
   create(data: any): Promise<any>;
   findById(id: string): Promise<any>;

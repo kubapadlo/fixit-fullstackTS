@@ -1,18 +1,10 @@
-import type { ReportedBy } from "./user.type";
+import { FAULT_CATEGORIES } from "@fixit/shared/src/types/fault";
+import z from "zod";
 
-interface Fault<TUser> {
-  id: string;
-  reportedAt: string;  
-  reportedBy: TUser;
-  category: 'Elektryk' | 'Hydraulik' | 'Murarz' | 'Malarz' | 'Stolarz' | 'Ślusarz';
-  description: string;
-  imageID: string;
-  imageURL: string;
-  review: string;
-  state: "reported" | "assigned" | "fixed";
-  assignedTo: string | null;
-  __v: number;
-}
+export const ReportFaultFormSchema = z.object({
+  description: z.string().min(5, "Opis musi mieć min. 5 znaków"),
+  category: z.enum(FAULT_CATEGORIES, "Musisz wybrać kategorię"),
+  image: z.instanceof(File).optional(),
+});
 
-export type FaultWithUserID = Fault<string>;
-export type FaultWithUserObject = Fault<ReportedBy>;
+export type ReportFaultDTO = z.infer<typeof ReportFaultFormSchema>;
