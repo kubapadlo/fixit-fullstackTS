@@ -1,16 +1,15 @@
 import { Router } from "express";
-import  {register,login, refreshToken, logout}  from "../controllers/authController";
+import { AuthController } from "../controllers/authController";
+import { validate } from "../middleware/validate";
+import { registerRequestSchema, loginRequestSchema } from "@fixit/shared";
 
-//middleware
-import {validate} from "../middleware/validate"
+export const createAuthRouter = (authController: AuthController) => {
+  const authRouter = Router();
 
-import { userLoginValidationSchema, userRegisterValidationSchema } from "../models/user.model";
+  authRouter.post("/register", validate(registerRequestSchema), authController.register);
+  authRouter.post("/login", validate(loginRequestSchema), authController.login);
+  authRouter.get("/refreshtoken", authController.refreshToken);
+  authRouter.get("/logout", authController.logout);
 
-const authRouter = Router();
-
-authRouter.post("/register", validate(userRegisterValidationSchema), register);
-authRouter.post("/login", validate(userLoginValidationSchema), login);
-authRouter.get("/refreshtoken", refreshToken);
-authRouter.get("/logout", logout)
-
-export default authRouter;
+  return authRouter;
+};

@@ -1,157 +1,74 @@
-// biblioteki
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { AuthService } from "../services/auth.service";
+import { LoginDTO, LoginResponse, RegisterDTO, RegisterResponse } from "@shared/index";
 
-// modele
-import User from "../models/user.model";
+const cookieOptions = (maxAge: number) => ({
+  httpOnly: true,
+  sameSite: "lax" as const,
+  maxAge
+});
 
-// typy
-import { LoginRequestBody, MyJwtPayload, RegisterRequestBody } from "../types/user.types";
+export class AuthController {
+  // Wstrzykujemy serwis przez konstruktor
+  constructor(private authService: AuthService) {}
 
-// flagi
-const debugMode = process.env.DEBUG_MODE === "true";
+  register = async (req: Request<{}, {}, RegisterDTO>, res: Response<RegisterResponse>) => {
+    try {
+      const { email, password, firstName, lastName, location } = req.body;
+      if (!email || !password || !firstName || !lastName || !location) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
 
-const register = async (req: Request<{},{}, RegisterRequestBody>, res: Response) => {
-  try {
-    const newUser = req.body;
-    
-    if (!newUser?.email || !newUser?.password || !newUser?.firstName || !newUser?.lastName) {
-      return res.status(400).json({ message: "No user data in request body" });
+      await this.authService.register(req.body);
+      return res.status(201).json({ message: "User created successfully" });
+    } catch (error: any) {
+      if (error.message === "USER_ALREADY_EXISTS") return res.status(400).json({ message: "Email already exists" });
+      if (error.message === "ROOM_FULL") return res.status(400).json({ message: "Room is already full" });
+      return res.status(500).json({ message: error.message });
     }
-
-    const alreadyExists = await User.findOne({ email: newUser.email }); 
-    if (alreadyExists) {
-      return res
-        .status(400)
-        .json({ message: "User with this email already exists" });
-    }
-
-    const usersInLocationCount = await User.countDocuments({ location: newUser.location });
-
-    if (usersInLocationCount >= 2) { 
-      return res
-        .status(400)
-        .json({ message: `Pokój ${newUser.location.dorm} ${newUser.location.room} został już przypisany do maksymalnej liczby osób(2). Skontaktuj się z administratorem.` });
-    }
-
-    const hashedPassword = await bcrypt.hash(newUser.password, 10);
-    
-    const createdUser = await User.create({
-      email: newUser.email,
-      passwordHash: hashedPassword,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      role: "student", // optional
-      location : newUser.location, 
-    });
-
-    return res
-      .status(201)
-      .json({ message: "User created successfuly" });
-  } catch (error: any) {
-    return res.status(500).json({ message: "Cant add user: " + error.message });
   }
-};
 
+  login = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | {message:string}>) => {
+    try {
+      const user = await this.authService.validateUser(req.body);
+      const { accessToken, refreshToken } = this.authService.generateTokens(user);
+      res.cookie("accessToken", accessToken, cookieOptions(1 * 60 * 1000));
+      res.cookie("refreshToken", refreshToken, cookieOptions(60 * 60 * 1000));
 
-const login = async(req: Request,res: Response)=>{
-  try {
-    console.log("Proba logowania")
-    const loginData = req.body as LoginRequestBody
-
-    if(!loginData.email || !loginData.password){
-      return res.status(400).json({message: "Missing email or password in request body"})
+      return res.status(200).json({
+        user: { id: user.id, role: user.role, fullName: user.fullName },
+        message: "Logged successfully"
+      });
+    } catch (error: any) {
+      if (error.message === "USER_NOT_FOUND" || error.message === "INVALID_CREDENTIALS") {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+      return res.status(500).json({ message: "Server error during login" });
     }
+  }
 
-    const user = await User.findOne({email: loginData.email})
-    if(!user){
-      return res.status(404).json({message: "User not found, please register first"})
+  refreshToken = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | { message: string }>) => {
+    try {
+      const token = req.cookies?.refreshToken;
+      if (!token) return res.status(401).json({ message: "No refresh token" });
+
+      const user = await this.authService.verifyRefreshToken(token);
+      const { accessToken } = this.authService.generateTokens(user);
+
+      res.cookie("accessToken", accessToken, cookieOptions(1 * 60 * 1000));
+      return res.status(200).json({
+        user: { id: user.id, role: user.role, fullName: user.fullName }, message: "Token refreshed successfully"
+      });
+    } catch (error: any) {
+      res.clearCookie("accessToken", { httpOnly: true });
+      res.clearCookie("refreshToken", { httpOnly: true });
+      return res.status(401).json({ message: "Token expired or invalid" });
     }
+  }
 
-    const isValid = await bcrypt.compare(loginData.password, user.passwordHash);
-
-    if(!isValid){
-      return res.status(401).json({message: "Wrong password"})
-    }
-
-    const accesToken = jwt.sign(
-      { userId: user._id, role:user.role }, 
-      process.env.SECRET_ACCESS_KEY as string, 
-      { expiresIn: debugMode ? "1m" : "1m" } 
-    );
-
-    const refreshToken = jwt.sign(
-      { userId: user._id, role:user.role }, 
-      process.env.SECRET_REFRESH_KEY as string, 
-      { expiresIn: "15m" } 
-    );
-
-    res.cookie("accessToken", accesToken, {
-      httpOnly: true, // Niedostępne dla JavaScript, ochrona przed XSS
-      sameSite: "lax",
-      maxAge: 1 * 60 * 1000,  // minuta
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 1000, // godzina
-    });
-      
-    return res.status(200).json({user:{id: user._id, role:user.role, fullName: `${user.firstName} ${user.lastName}`}, accessToken: accesToken, message: "Logged sucessfuly"})
-    
-  } catch (error) {
-    return res.status(500).json({message: "Server error while logging"})
+  logout = (req: Request, res: Response) => {
+    res.clearCookie("accessToken", { httpOnly: true });
+    res.clearCookie("refreshToken", { httpOnly: true });
+    return res.sendStatus(204);
   }
 }
-
-const refreshToken = async(req:Request, res:Response) => {
-  try {
-  const rtoken = req.cookies?.refreshToken;
-  if (!rtoken){
-    return res.status(401).json({message: "No refresh token in cookie"})
-  }
-
-  jwt.verify(rtoken, process.env.SECRET_REFRESH_KEY as string, async(err:any, decoded:any)=>{
-    if(err){
-      return res.status(401).json({message: "Refresh token is not valid"})
-    }
-    const payload = decoded as MyJwtPayload;
-    const user = await User.findById(payload.userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const newAccessToken = jwt.sign({userId: payload.userId, role: payload.role}, process.env.SECRET_ACCESS_KEY as string, { expiresIn: "1m" }  )
-
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true, // Niedostępne dla JavaScript, ochrona przed XSS
-      sameSite: "lax",
-      maxAge: 1 * 60 * 1000,  // minuta
-    });
-
-    return res.status(200).json({user:{id: payload.userId, role: payload.role, fullName: `${user.firstName} ${user.lastName}`}})
-  })
-  } catch (error) {
-    return res.status(500).json({message: "Internal Server Error"})
-  }
-
-};
-
-const logout = (req:Request, res:Response) => {
-  try {
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-    });
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-    });
-
-    return res.sendStatus(204);
-  } catch (error) {
-    res.sendStatus(500)
-  }
-};
-
-export {register,login, refreshToken, logout}

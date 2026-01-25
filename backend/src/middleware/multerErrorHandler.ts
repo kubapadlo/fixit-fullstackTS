@@ -3,7 +3,7 @@ import multer from "multer";
 // uwaga: multer przu bledzie automatycznie wyrzuci next(error)
 import { ErrorRequestHandler } from "express";
 
-export const multerErrorHandler: ErrorRequestHandler = (err,req,res,next) => {
+export const multerErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     return res.status(404).send("blad multera: " + err.message);
   } else if (err) {

@@ -1,18 +1,17 @@
-import dotenv from "dotenv";
 import mongoose from "mongoose";
+import { prisma } from "../../lib/prisma"
 
-dotenv.config();
+export const connectDB = async () => {
+  const dbType = process.env.DB_TYPE;
 
-const connectDB = async () => {
-  try {
+  if (dbType === "mongo") {
     const mongoUri = process.env.MONGO_URI;
-    if (!mongoUri) throw new Error("MONGO_URI not defined in .env");
-
+    if (!mongoUri) throw new Error("MONGO_URI not defined");
     await mongoose.connect(mongoUri);
-    console.log("Connected to DB");
-  } catch (error: any) {
-    throw error;
+    console.log("Connected to MongoDB");
+  } else {
+    // Prisma łączy się automatycznie, ale możemy sprawdzić połączenie
+    await prisma.$connect();
+    console.log("Connected to PostgreSQL via Prisma");
   }
 };
-
-export default connectDB;

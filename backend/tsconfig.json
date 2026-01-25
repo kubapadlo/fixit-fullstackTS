@@ -2,13 +2,22 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
-    "rootDir": "./src", 
-    "outDir": "./dist", 
+    "rootDir": "..",       // ZMIANA: teraz obejmuje cały projekt (backend i shared)
+    "baseUrl": ".",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@shared/*": ["../shared/src/*"]
+    }
   },
-  "include": ["src/**/*.ts"], 
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts",
+    "../shared/src/**/*.ts", // DODANO: musisz uwzględnić shared w kompilacji
+    "lib/**/*.ts",
+    "prisma.config.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
 }

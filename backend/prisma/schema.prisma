@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  student
+  technician
+  admin
+}
+
+model User {
+  id             String  @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(student)
+  firstName    String
+  lastName     String
+  
+  dorm         String?
+  room         String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  reportedFaults Fault[] @relation("ReportedFaults")
+  assignedFaults Fault[] @relation("AssignedFaults")
+}
+
+enum Category {
+  Elektryk
+  Hydraulik
+  Murarz
+  Malarz
+  Stolarz
+  Slusarz
+}
+
+enum FaultState {
+  reported
+  assigned
+  fixed
+}
+
+model Fault {
+  id           String     @id @default(uuid())
+  reportedAt   DateTime   @default(now())
+  category     Category
+  description  String
+  state        FaultState @default(reported)
+  review       String?    @default("")
+  imageURL     String?    @default("")
+  imageID      String?    @default("")
+
+  // Relacja do zgłaszającego
+  reportedBy   User       @relation("ReportedFaults", fields: [reportedById], references: [id])
+  reportedById String
+
+  // Relacja do technika
+  assignedTo   User?      @relation("AssignedFaults", fields: [assignedToId], references: [id])
+  assignedToId String?
+}
