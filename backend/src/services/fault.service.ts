@@ -33,15 +33,12 @@ export class FaultService {
 
     return await this.faultRepository.create({
       reportedAt: new Date(),
-      // reportedBy: userId,  // ZAKOMENTOWAĆ DLA SQL
+      reportedBy: userId,
       category: data.category,
       description: data.description,
       state: data.state,
       imageURL,
-      imageID,
-      reportedByUser: {
-        connect: { id: userId }
-      }
+      imageID
     });
   }
 

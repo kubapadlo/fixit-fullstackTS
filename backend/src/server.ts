@@ -23,6 +23,10 @@ const PORT = process.env.PORT || 5000;
 
 async function startServer(): Promise<void> {
   try {
+    if(process.env.DB_TYPE !== "mongo" && process.env.DB_TYPE !== "sql") {
+      throw new Error("Invalid DB_TYPE in .env. Use 'mongo' or 'sql'.");
+    }
+    
     // 1. Połączenie z bazą (na podstawie DB_TYPE w .env)
     await connectDB();
 

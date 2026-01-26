@@ -1,10 +1,23 @@
-import { FaultWithUserObject } from "@shared/types/fault";
+import { FaultWithUserObject, ICreateFaultData } from "@shared/types/fault";
 import { prisma } from "../../../lib/prisma";
 import { IFaultRepository } from "../fault.repository.interface";
 
 export class PrismaFaultRepository implements IFaultRepository {
-  async create(data: any) {
-    return prisma.fault.create({ data });
+  async create(data: ICreateFaultData) {
+    return prisma.fault.create({
+      data: {
+        description: data.description,
+        category: data.category as any, // rzutowanie na Enum Prismy
+        state: data.state as any,
+        reportedAt: data.reportedAt,
+        imageURL: data.imageURL,
+        imageID: data.imageID,
+        // Używamy pola id bezpośrednio (kolumna reportedBy w bazie)
+        reportedBy: data.reportedBy, 
+        // LUB alternatywnie (jeśli wolisz connect):
+        // reportedByUser: { connect: { id: data.reportedBy } }
+      }
+    });
   }
 
   async findById(id: string) {

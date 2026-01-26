@@ -102,3 +102,13 @@ export type AddReviewResponse = {
   message: string;
 };
 // -----------------------------------------------------------
+
+export interface ICreateFaultData {
+  reportedBy: string; // ID użytkownika
+  category: string;
+  description: string;
+  state?: string;
+  reportedAt?: Date;
+  imageURL?: string;
+  imageID?: string;
+}

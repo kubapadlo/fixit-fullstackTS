@@ -1,12 +1,9 @@
-import { FaultWithUserID, FaultWithUserObject } from "@shared/types/fault";
+import { FaultWithUserID, FaultWithUserObject, ICreateFaultData } from "@shared/types/fault";
 import {Fault} from "../../models/fault.model" // Zakładam że masz taki model
 import { IFaultRepository } from "../fault.repository.interface";
 
 export class MongooseFaultRepository implements IFaultRepository {
-  async create(data: any) {
-    // Mapowanie reportedById na reportedBy dla Mongo jeśli trzeba
-    //const mongoData = { ...data, reportedBy: data.reportedBy };
-    //delete mongoData.reportedBy;
+  async create(data: ICreateFaultData) {
     return Fault.create(data);
   }
 
