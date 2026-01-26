@@ -5,9 +5,9 @@ import { IFaultRepository } from "../fault.repository.interface";
 export class MongooseFaultRepository implements IFaultRepository {
   async create(data: any) {
     // Mapowanie reportedById na reportedBy dla Mongo jeśli trzeba
-    const mongoData = { ...data, reportedBy: data.reportedById };
-    delete mongoData.reportedById;
-    return Fault.create(mongoData);
+    //const mongoData = { ...data, reportedBy: data.reportedBy };
+    //delete mongoData.reportedBy;
+    return Fault.create(data);
   }
 
   async findById(id: string) {

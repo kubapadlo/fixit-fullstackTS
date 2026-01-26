@@ -12,13 +12,13 @@ export class PrismaFaultRepository implements IFaultRepository {
   }
 
   async findManyByUserId(userId: string) {
-    return prisma.fault.findMany({ where: { reportedById: userId } });
+    return prisma.fault.findMany({ where: { reportedBy: userId } });
   }
 
   async findAllWithUser() {
     return prisma.fault.findMany({
       include: {
-        reportedBy: {
+        reportedByUser: {
           select: { firstName: true, lastName: true, dorm: true, room: true }
         }
       }
@@ -31,7 +31,7 @@ export class PrismaFaultRepository implements IFaultRepository {
 
   async updateWithUserCheck(id: string, userId: string, data: any) {
     return prisma.fault.update({
-      where: { id, reportedById: userId },
+      where: { id, reportedBy: userId },
       data
     });
   }

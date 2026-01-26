@@ -57,7 +57,7 @@ export class AuthService {
     // Tworzymy użytkownika w bazie
     const newUser = await this.userRepository.create({
       ...data,
-      //role: "student", 
+      //role: "technician",
       passwordHash: hashedPassword,
     });
 

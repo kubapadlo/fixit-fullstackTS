@@ -33,12 +33,15 @@ export class FaultService {
 
     return await this.faultRepository.create({
       reportedAt: new Date(),
-      reportedById: userId,
+      // reportedBy: userId,  // ZAKOMENTOWAĆ DLA SQL
       category: data.category,
       description: data.description,
       state: data.state,
       imageURL,
-      imageID
+      imageID,
+      reportedByUser: {
+        connect: { id: userId }
+      }
     });
   }
 
@@ -73,7 +76,6 @@ export class FaultService {
     const faultToReview: FaultWithUserObject | null = await this.faultRepository.findById(faultId);
 
     if (!faultToReview) throw new Error("FAULT_NOT_FOUND");
-    console.log(technicianId, faultToReview.assignedTo);
     if (faultToReview.assignedTo && faultToReview.assignedTo.toString() !== technicianId) throw new Error("ASSIGNED_TO_OTHER");
     if (faultToReview.state === 'reported' && state === "fixed") throw new Error("NOT_ASSIGNED_YET");
     if (faultToReview.state === 'fixed' && state !== 'fixed') throw new Error("CANNOT_UNDO_FIXED");
@@ -87,9 +89,9 @@ export class FaultService {
 
   async deleteFault(faultId: string, userId: string) {
     const fault = await this.faultRepository.findById(faultId);
-    console.log(userId, fault?.reportedBy._id.toString());
+    console.log(userId, fault?.reportedBy.toString());
     if (!fault) throw new Error("FAULT_NOT_FOUND");
-    if (fault?.reportedBy._id.toString() !== userId) throw new Error("DELETE_FORBIDDEN");
+    if (fault?.reportedBy.toString() !== userId) throw new Error("DELETE_FORBIDDEN");
     if (fault.state === "assigned" || fault.state === "fixed") throw new Error("DELETE_FORBIDDEN");
 
     const result = await this.faultRepository.delete(faultId);

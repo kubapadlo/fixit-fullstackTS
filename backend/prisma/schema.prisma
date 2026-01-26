@@ -56,11 +56,13 @@ model Fault {
   imageURL     String?    @default("")
   imageID      String?    @default("")
 
-  // Relacja do zgłaszającego
-  reportedBy   User       @relation("ReportedFaults", fields: [reportedById], references: [id])
-  reportedById String
+  // Relacja do zgłaszającego (studenta)
+  // Pole 'reportedBy' jest WIRTUALNE (nie ma go w bazie SQL)
+  reportedByUser   User       @relation("ReportedFaults", fields: [reportedBy], references: [id])
+  reportedBy String     // To jest RZECZYWISTA kolumna w bazie
 
   // Relacja do technika
-  assignedTo   User?      @relation("AssignedFaults", fields: [assignedToId], references: [id])
-  assignedToId String?
+  // Pole 'assignedTo' jest WIRTUALNE (nie ma go w bazie SQL)
+  assignedToUser   User?      @relation("AssignedFaults", fields: [assignedTo], references: [id])
+  assignedTo String?    // To jest RZECZYWISTA kolumna w bazie
 }

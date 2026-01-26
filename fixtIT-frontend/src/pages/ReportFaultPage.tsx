@@ -51,7 +51,6 @@ export default function ReportFaultPage() {
       reset();
     },
     onError: (error: Error) => {
-      // TUTAJ POPRAWKA: Używamy error.message, bo addFault rzuca Error
       enqueueSnackbar(error.message, { variant: "error" });
     },
   });

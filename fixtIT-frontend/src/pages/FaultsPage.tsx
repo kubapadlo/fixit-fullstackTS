@@ -4,10 +4,11 @@ import FaultCard from "../components/FaultCard";
 import { Box, Typography } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import deleteFault from "../services/deleteFault";
+import { FaultWithUserID } from "@fixit/shared/src/types/fault";
 
 export const FaultsPage = () => {
   const queryclient = useQueryClient();
-  const { data =[], isLoading, isError } = useQuery({
+  const { data =[], isLoading, isError } = useQuery<FaultWithUserID[]>({
     queryFn: getFaults,
     queryKey: ["faults"],
   });
@@ -50,7 +51,7 @@ export const FaultsPage = () => {
     >
       {data.map((fault) => (
         <FaultCard
-          key={fault._id}
+          key={fault.id}
           category={fault.category}
           description={fault.description}
           reportedAt={fault.reportedAt}
@@ -59,7 +60,7 @@ export const FaultsPage = () => {
           onDelete={(id) => {
             handleDelete(id);
           }}
-          id={fault._id}
+          id={fault.id}
         />
       ))}
       {deleteMutation.isPending && (
