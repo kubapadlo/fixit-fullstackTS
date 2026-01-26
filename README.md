@@ -1,4 +1,4 @@
-# fixIT – Fullstack Asset Management System
+# fixIT – Fullstack Dormitory Faults Management System
 
 A professional **SPA + REST API** platform built in a **Monorepo** architecture, emphasizing clean architecture, security, and scalability.
 
