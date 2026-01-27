@@ -86,7 +86,6 @@ export class FaultService {
 
   async deleteFault(faultId: string, userId: string) {
     const fault = await this.faultRepository.findById(faultId);
-    console.log(userId, fault?.reportedBy.toString());
     if (!fault) throw new Error("FAULT_NOT_FOUND");
     if (fault?.reportedBy.toString() !== userId) throw new Error("DELETE_FORBIDDEN");
     if (fault.state === "assigned" || fault.state === "fixed") throw new Error("DELETE_FORBIDDEN");

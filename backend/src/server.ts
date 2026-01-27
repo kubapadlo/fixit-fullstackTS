@@ -52,12 +52,12 @@ async function startServer(): Promise<void> {
 
     app.listen(PORT, () => {
       console.log(`=================================`);
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📦 Database: ${process.env.DB_TYPE?.toUpperCase()}`);
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Database: ${process.env.DB_TYPE?.toUpperCase()}`);
       console.log(`=================================`);
     });
   } catch (error: any) {
-    console.error("❌ Starting server failed:", error.message);
+    console.error("Starting server failed:", error.message);
     process.exit(1);
   }
 }

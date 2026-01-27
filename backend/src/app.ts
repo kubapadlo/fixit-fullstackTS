@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import helmet from "helmet";
 import rateLimit from 'express-rate-limit'
+import { multerErrorHandler } from "./middleware/multerErrorHandler";
 
 const app = express();
 
