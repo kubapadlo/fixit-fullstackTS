@@ -18,6 +18,7 @@ import { FaultController } from "./controllers/faultController";
 // Routery (jako funkcje)
 import { createAuthRouter } from "./routers/authRoutes";
 import { createFaultRouter } from "./routers/faultRouter";
+import globalErrorHandler from './middleware/globalErrorHandler';
 
 const PORT = process.env.PORT || 5000;
 
@@ -49,6 +50,9 @@ async function startServer(): Promise<void> {
     // Przekazujemy zainicjalizowany kontroler do funkcji routera
     app.use("/api/auth", createAuthRouter(authController));
     app.use("/api/user", createFaultRouter(faultController));
+
+    // 6. Globalny handler błędów
+    app.use(globalErrorHandler);
 
     app.listen(PORT, () => {
       console.log(`=================================`);

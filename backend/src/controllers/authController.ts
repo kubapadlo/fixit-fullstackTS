@@ -8,24 +8,16 @@ const cookieOptions = (maxAge: number) => ({
   maxAge
 });
 
+// kontroler zajmuje sie obsługa tylko pomyslnych odpowiedzi
+// bledy rzucane przez serwis sa obslugiwane przez globalny handler bledow
+
 export class AuthController {
   // Wstrzykujemy serwis przez konstruktor
   constructor(private authService: AuthService) {}
 
   register = async (req: Request<{}, {}, RegisterDTO>, res: Response<RegisterResponse>) => {
-    try {
-      const { email, password, firstName, lastName, location } = req.body;
-      if (!email || !password || !firstName || !lastName || !location) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      await this.authService.register(req.body);
-      return res.status(201).json({ message: "User created successfully" });
-    } catch (error: any) {
-      if (error.message === "USER_ALREADY_EXISTS") return res.status(400).json({ message: "Email already exists" });
-      if (error.message === "ROOM_FULL") return res.status(400).json({ message: "Room is already full" });
-      return res.status(500).json({ message: error.message });
-    }
+    await this.authService.register(req.body);
+    return res.status(201).json({ message: "User created successfully" });
   }
 
   login = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | {message:string}>) => {

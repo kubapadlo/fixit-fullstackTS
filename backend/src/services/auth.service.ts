@@ -10,6 +10,7 @@ import {
   UserRole 
 } from "@shared/types/user";
 import { MyJwtPayload } from "../types/auth.types";
+import { ROOM_FULL, USER_ALREADY_EXISTS } from "src/errors/errors";
 
 export class AuthService {
   constructor(private userRepository: IUserRepository) {}
@@ -41,7 +42,7 @@ export class AuthService {
 
   async register(data: RegisterDTO): Promise<User> {
     const alreadyExists = await this.userRepository.findByEmail(data.email);
-    if (alreadyExists) throw new Error("USER_ALREADY_EXISTS");
+    if (alreadyExists) throw new USER_ALREADY_EXISTS();
 
     // Logika biznesowa: tylko studenci mają limit w pokoju
     if (data.role === "student" && data.location) {
@@ -49,7 +50,7 @@ export class AuthService {
         data.location.dorm, 
         data.location.room
       );
-      if (count >= 2) throw new Error("ROOM_FULL");
+      if (count >= 2) throw new ROOM_FULL();
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
