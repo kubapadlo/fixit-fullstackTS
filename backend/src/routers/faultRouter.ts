@@ -36,7 +36,7 @@ export const createFaultRouter = (faultController: FaultController) => {
   faultRouter.get("/showFaults", verifyJWT, faultController.showFaults);
 
   // Wszystkie usterki (publiczne lub dla admina)
-  faultRouter.get("/getAllFaults", faultController.getAllFaults);
+  faultRouter.get("/getAllFaults", verifyJWT, verifyRole('technician'), faultController.getAllFaults);
 
   // Edycja usterki - aktualnie nieużywany endpoint
   // faultRouter.put('/:faultID/edit', verifyJWT, upload, validate(editFaultSchema), faultController.editFault);

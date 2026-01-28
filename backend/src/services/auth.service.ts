@@ -10,7 +10,7 @@ import {
   UserRole 
 } from "@shared/types/user";
 import { MyJwtPayload } from "../types/auth.types";
-import { ROOM_FULL, USER_ALREADY_EXISTS } from "src/errors/errors";
+import { INVALID_REFRESH_TOKEN, NOT_FOUND, ROOM_FULL, UNAUTHORIZED, USER_ALREADY_EXISTS } from "src/errors/errors";
 
 export class AuthService {
   constructor(private userRepository: IUserRepository) {}
@@ -68,10 +68,10 @@ export class AuthService {
 
   async validateUser(data: LoginDTO): Promise<AuthUser> {
     const user = await this.userRepository.findByEmail(data.email);
-    if (!user) throw new Error("USER_NOT_FOUND");
+    if (!user) throw new NOT_FOUND("User not found");
     
     const isValid = await bcrypt.compare(data.password, user.passwordHash);
-    if (!isValid) throw new Error("INVALID_CREDENTIALS");
+    if (!isValid) throw new UNAUTHORIZED("Invalid email or password");
 
     // Do celów logowania zwracamy AuthUser (id, fullName, role)
     return this.mapToAuthUser(user);
@@ -99,18 +99,19 @@ export class AuthService {
   }
 
   async verifyRefreshToken(token: string): Promise<AuthUser> {
+    let decoded: MyJwtPayload;
     try {
-      const decoded = jwt.verify(
+      decoded = jwt.verify(
         token, 
         process.env.SECRET_REFRESH_KEY!
       ) as MyJwtPayload;
+    } catch (err) {
+      throw new INVALID_REFRESH_TOKEN();
+    }
 
       const user = await this.userRepository.findById(decoded.userId);
-      if (!user) throw new Error("USER_NOT_FOUND");
+      if (!user) throw new NOT_FOUND("User not found");
 
       return this.mapToAuthUser(user);
-    } catch (err) {
-      throw new Error("INVALID_REFRESH_TOKEN");
-    }
   }
 }

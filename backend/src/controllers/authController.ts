@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { LoginDTO, LoginResponse, RegisterDTO, RegisterResponse } from "@shared/index";
+import { th } from "zod/v4/locales";
+import { INVALID_REFRESH_TOKEN } from "src/errors/errors";
 
 const cookieOptions = (maxAge: number) => ({
   httpOnly: true,
@@ -21,7 +23,6 @@ export class AuthController {
   }
 
   login = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | {message:string}>) => {
-    try {
       const user = await this.authService.validateUser(req.body);
       const { accessToken, refreshToken } = this.authService.generateTokens(user);
       res.cookie("accessToken", accessToken, cookieOptions(1 * 60 * 1000));
@@ -31,18 +32,12 @@ export class AuthController {
         user: { id: user.id, role: user.role, fullName: user.fullName },
         message: "Logged successfully"
       });
-    } catch (error: any) {
-      if (error.message === "USER_NOT_FOUND" || error.message === "INVALID_CREDENTIALS") {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-      return res.status(500).json({ message: "Server error during login" });
-    }
-  }
+    } 
+  
 
   refreshToken = async (req: Request<{}, {}, LoginDTO>, res: Response<LoginResponse | { message: string }>) => {
-    try {
       const token = req.cookies?.refreshToken;
-      if (!token) return res.status(401).json({ message: "No refresh token" });
+      if (!token) throw new INVALID_REFRESH_TOKEN("No refresh token in the cookies");
 
       const user = await this.authService.verifyRefreshToken(token);
       const { accessToken } = this.authService.generateTokens(user);
@@ -51,12 +46,8 @@ export class AuthController {
       return res.status(200).json({
         user: { id: user.id, role: user.role, fullName: user.fullName }, message: "Token refreshed successfully"
       });
-    } catch (error: any) {
-      res.clearCookie("accessToken", { httpOnly: true });
-      res.clearCookie("refreshToken", { httpOnly: true });
-      return res.status(401).json({ message: "Token expired or invalid" });
-    }
-  }
+    } 
+  
 
   logout = (req: Request, res: Response) => {
     res.clearCookie("accessToken", { httpOnly: true });

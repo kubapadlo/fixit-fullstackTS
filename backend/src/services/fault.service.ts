@@ -3,6 +3,7 @@ import { createReadStream } from 'streamifier';
 import { IFaultRepository } from "../repositories/fault.repository.interface";
 import { IUserRepository } from "../repositories/user.repository.interface";
 import { CreateFaultDTO, EditFaultDTO, AddReviewDTO, IFault, FaultWithUserObject, FaultWithUserID } from "@shared/types/fault";
+import { DELETE_FORBIDDEN, FAULT_STATE_UPDATE_ERROR, NOT_FOUND } from "src/errors/errors";
 
 export class FaultService {
   constructor(
@@ -22,7 +23,7 @@ export class FaultService {
 
   async createFault(userId: string, data: CreateFaultDTO, fileBuffer?: Buffer) {
     const foundUser = await this.userRepository.findById(userId);
-    if (!foundUser) throw new Error("USER_NOT_FOUND");
+    if (!foundUser) throw new NOT_FOUND("User not found");
 
     let imageURL, imageID;
     if (fileBuffer) {
@@ -52,7 +53,7 @@ export class FaultService {
 
   async updateFault(faultId: string, userId: string, description: string, fileBuffer?: Buffer) {
     const faultToUpdate = await this.faultRepository.findById(faultId);
-    if (!faultToUpdate) throw new Error("FAULT_NOT_FOUND");
+    if (!faultToUpdate) throw new NOT_FOUND("FAULT_NOT_FOUND");
 
     const newData: any = { description };
 
@@ -72,10 +73,10 @@ export class FaultService {
     const { state, review } = data;
     const faultToReview: FaultWithUserObject | null = await this.faultRepository.findById(faultId);
 
-    if (!faultToReview) throw new Error("FAULT_NOT_FOUND");
-    if (faultToReview.assignedTo && faultToReview.assignedTo.toString() !== technicianId) throw new Error("ASSIGNED_TO_OTHER");
-    if (faultToReview.state === 'reported' && state === "fixed") throw new Error("NOT_ASSIGNED_YET");
-    if (faultToReview.state === 'fixed' && state !== 'fixed') throw new Error("CANNOT_UNDO_FIXED");
+    if (!faultToReview) throw new NOT_FOUND("FAULT_NOT_FOUND");
+    if (faultToReview.assignedTo && faultToReview.assignedTo.toString() !== technicianId) throw new FAULT_STATE_UPDATE_ERROR("ASSIGNED_TO_OTHER");
+    if (faultToReview.state === 'reported' && state === "fixed") throw new FAULT_STATE_UPDATE_ERROR("NOT_ASSIGNED_YET");
+    if (faultToReview.state === 'fixed' && state !== 'fixed') throw new FAULT_STATE_UPDATE_ERROR("CANNOT_UNDO_FIXED");
 
     const updateData: Partial<FaultWithUserObject> = { state };
     if (state === "assigned") updateData.assignedTo = technicianId;
@@ -86,9 +87,9 @@ export class FaultService {
 
   async deleteFault(faultId: string, userId: string) {
     const fault = await this.faultRepository.findById(faultId);
-    if (!fault) throw new Error("FAULT_NOT_FOUND");
-    if (fault?.reportedBy.toString() !== userId) throw new Error("DELETE_FORBIDDEN");
-    if (fault.state === "assigned" || fault.state === "fixed") throw new Error("DELETE_FORBIDDEN");
+    if (!fault) throw new NOT_FOUND("FAULT_NOT_FOUND");
+    if (fault?.reportedBy.toString() !== userId) throw new DELETE_FORBIDDEN();
+    if (fault.state === "assigned" || fault.state === "fixed") throw new DELETE_FORBIDDEN();
 
     const result = await this.faultRepository.delete(faultId);
 

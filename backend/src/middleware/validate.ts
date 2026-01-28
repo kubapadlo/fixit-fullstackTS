@@ -17,7 +17,6 @@ export const validate = (schema: ZodObject<any>) =>
       
       next();
     } catch (error) {
-      console.error("VALIDATION MIDDLEWARE ERROR:", error);
       if (error instanceof ZodError) {
         return res.status(400).json({
           message: "Validation error",
