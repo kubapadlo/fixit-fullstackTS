@@ -93,7 +93,7 @@ export type CreateFaultResponse = {
 };
 
 export type GetUserFaultsResponse = {
-  faults: FaultWithUserObject[];
+  faults: FaultWithUserObject[] | FaultWithUserID[];
   message:string;
 };
 

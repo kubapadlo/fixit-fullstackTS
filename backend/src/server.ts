@@ -9,6 +9,9 @@ import { MongooseUserRepository } from "./repositories/mongoose/user.mongoose.re
 import { PrismaFaultRepository } from "./repositories/prisma/prisma.fault.repository";
 import { MongooseFaultRepository } from "./repositories/mongoose/mongoose.fault.repository";
 
+// utils
+import { redisClient } from './config/redis';
+
 // Serwisy i Kontrolery
 import { AuthService } from "./services/auth.service";
 import { FaultService } from "./services/fault.service";
@@ -19,6 +22,7 @@ import { FaultController } from "./controllers/faultController";
 import { createAuthRouter } from "./routers/authRoutes";
 import { createFaultRouter } from "./routers/faultRouter";
 import globalErrorHandler from './middleware/globalErrorHandler';
+import { CacheService } from './services/cache.service';
 
 const PORT = process.env.PORT || 5000;
 
@@ -39,9 +43,15 @@ async function startServer(): Promise<void> {
       ? new MongooseFaultRepository()
       : new PrismaFaultRepository();
 
+    // redis
+    await redisClient.connect();
+    console.log("Redis connected");
+    const cacheService = new CacheService(redisClient)
+
     // 3. Wstrzykiwanie zależności - WARSTWA LOGIKI
     const authService = new AuthService(userRepository);
-    const faultService = new FaultService(faultRepository, userRepository);
+    const faultService = new FaultService(faultRepository, userRepository, cacheService);
+
     // 4. Wstrzykiwanie zależności - WARSTWA HTTP
     const authController = new AuthController(authService);
     const faultController = new FaultController(faultService);

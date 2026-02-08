@@ -33,7 +33,7 @@ export const createFaultRouter = (faultController: FaultController) => {
   faultRouter.post("/addFault", verifyJWT, upload, multerErrorHandler, validate(createFaultRequestSchema), faultController.addFault);
 
   // Usterki zalogowanego użytkownika
-  faultRouter.get("/showFaults", verifyJWT, faultController.showFaults);
+  faultRouter.get("/showFaults", verifyJWT, verifyRole('student'), faultController.showFaults);
 
   // Wszystkie usterki (publiczne lub dla admina)
   faultRouter.get("/getAllFaults", verifyJWT, verifyRole('technician'), faultController.getAllFaults);

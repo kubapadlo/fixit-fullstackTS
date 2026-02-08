@@ -4,11 +4,13 @@ import { IFaultRepository } from "../repositories/fault.repository.interface";
 import { IUserRepository } from "../repositories/user.repository.interface";
 import { CreateFaultDTO, EditFaultDTO, AddReviewDTO, IFault, FaultWithUserObject, FaultWithUserID } from "@shared/types/fault";
 import { DELETE_FORBIDDEN, FAULT_STATE_UPDATE_ERROR, NOT_FOUND } from "src/errors/errors";
+import { CacheService } from "./cache.service";
 
 export class FaultService {
   constructor(
     private faultRepository: IFaultRepository,
-    private userRepository: IUserRepository
+    private userRepository: IUserRepository,
+    private cache: CacheService
   ) {}
 
   private async uploadToCloudinary(filebuffer: Buffer): Promise<{ url: string | undefined; id: string | undefined }> {
@@ -32,6 +34,8 @@ export class FaultService {
       imageID = id;
     }
 
+    this.cache.invalidate("faults:*")
+    
     return await this.faultRepository.create({
       reportedAt: new Date(),
       reportedBy: userId,
@@ -44,11 +48,19 @@ export class FaultService {
   }
 
   async getUserFaults(userId: string) {
-    return await this.faultRepository.findManyByUserId(userId);
+    return this.cache.getOrSet<FaultWithUserID[]>(
+      `faults:${userId}`,                
+      () => this.faultRepository.findManyByUserId(userId), 
+      60                          
+    );
   }
 
   async getAllFaults() {
-    return await this.faultRepository.findAllWithUser();
+    return this.cache.getOrSet<FaultWithUserObject[]>(
+      'faults:all',                
+      () => this.faultRepository.findAllWithUser(), 
+      60                          
+    );
   }
 
   async updateFault(faultId: string, userId: string, description: string, fileBuffer?: Buffer) {
