@@ -7,6 +7,8 @@ A professional **SPA + REST API** platform built in a **Monorepo** architecture,
 *   **Fullstack TypeScript**: Full type consistency across the entire project.
 *   **Repository Pattern**: Database abstraction allowing seamless switching between **MongoDB (Mongoose)** and **PostgreSQL (Prisma)**.
 *   **Single Source of Truth**: Shared **Zod** schemas and **DTOs** in the `shared` folder – one validation definition for both frontend and backend.
+*   **Caching**: Caching with Redis for fetching faults, which significantly improves the performance of data retrieval.
+*   **Global Error Handler**: Centralized error handling middleware with custom error classes. This approach decouples error logic from controllers and reduces duplication.
 *   **RBAC Permissions System**: Full Role-Based Access Control with dedicated Guards on the frontend and middleware role validator on backend.
 *   **JWT Authentication**: Secure Access & Refresh Token flow utilizing **HttpOnly** cookies.
 *   **Cloudinary Integration**: Support for image uploads (Multer) with cloud-based hosting.
